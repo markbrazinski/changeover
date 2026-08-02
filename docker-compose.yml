@@ -1,0 +1,60 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-lifecycle
+      - --web.enable-admin-api
+
+  pushgateway:
+    image: prom/pushgateway:latest
+    ports:
+      - "9091:9091"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+
+  grafana-mcp:
+    image: mcp/grafana:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - GRAFANA_URL=http://grafana:3000
+      - GRAFANA_SERVICE_ACCOUNT_TOKEN=${GRAFANA_SERVICE_ACCOUNT_TOKEN}
+    command:
+      - -t=streamable-http
+      - -address=0.0.0.0:8000
+      - -enabled-tools=search,datasource,prometheus,navigation
+    depends_on:
+      - grafana
+
+  # Points at the real Grafana Cloud stack (curiousburrito1209), using the
+  # open-source-MCP-server + service-account-token path the hackathon docs
+  # sanction for unattended/server-side agents (vs. the hosted mcp.grafana.com
+  # endpoint, which requires interactive browser OAuth).
+  grafana-mcp-cloud:
+    image: mcp/grafana:latest
+    ports:
+      - "8001:8000"
+    environment:
+      - GRAFANA_URL=${GRAFANA_URL}
+      - GRAFANA_SERVICE_ACCOUNT_TOKEN=${GRAFANA_SERVICE_ACCOUNT_TOKEN}
+    command:
+      - -t=streamable-http
+      - -address=0.0.0.0:8000
+      - -allowed-hosts=*
+      - -enabled-tools=search,datasource,prometheus,navigation

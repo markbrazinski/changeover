@@ -1,0 +1,22 @@
+{
+  "snapshot_id": "B",
+  "window": "2026-08-01T20:00:00Z to 2026-08-01T20:05:00Z",
+  "layers": {
+    "captions": {
+      "layer_up": 1,
+      "caption_sync_offset_seconds": [0.05, 0.06, 0.05, 0.07, 0.06, 0.05, 0.06]
+    },
+    "sign_language": {
+      "layer_up": 1,
+      "sign_feed_freshness_seconds": [0.2, 0.21, 0.19, 8.4, 22.1, 35.7, 49.3],
+      "sign_feed_frame_rate_fps": [29.9, 30.0, 30.1, 0.0, 0.0, 0.0, 0.0]
+    },
+    "audio_description": {
+      "layer_up": 1
+    },
+    "caption_generation_upstream": {
+      "caption_gen_success_rate": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    }
+  },
+  "notes": "Values are per-minute samples across the window, oldest first."
+}

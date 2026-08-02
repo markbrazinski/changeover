@@ -1,0 +1,195 @@
+# Changeover
+
+An agent for live broadcast that treats each accessibility layer — captions, sign-language
+feed, audio description — as a first-class monitored system. When one degrades, the agent
+investigates across layers through Grafana to isolate *which* layer failed and *why*, then
+a separate, narrowly-scoped tool fails over to a verified backup feed with a human
+authorizing the switch.
+
+Built for the Agentic Cinema hackathon (Google Cloud + Grafana partner track).
+
+## Architecture
+
+```
+  ffmpeg (real media pipeline)
+       │  real caption-sync / sign-freeze / caption-gen telemetry
+       ▼
+  Prometheus (local, docker-compose) ──remote_write──▶ Grafana Cloud (Mimir)
+                                                              │
+                                                              ▼
+                                            Grafana MCP server (official grafana/mcp-grafana,
+                                            streamable-http, service-account token)
+                                                              │
+                                                              ▼
+                                  Gemini 2.5 Flash agent (Google ADK, MCPToolset)
+                                       — investigates via real PromQL queries —
+                                                              │
+                                                    (evidence gate: refuses to
+                                                     diagnose on unavailable /
+                                                     empty / stale / partial data)
+                                                              │
+                                                              ▼
+                                    request_failover(layer, reason)  ◀── requires a real,
+                                                              │           human-provided
+                                                              ▼           authorizer string
+                                    failover_tool.py (SEPARATE from Grafana —
+                                    Grafana investigates, this tool acts)
+                                       — re-verifies backup health for real —
+                                                              │
+                                                              ▼
+                                        logs/feed_state.json (real, inspectable
+                                        state change + audit trail)
+```
+
+**Design constraint:** Grafana is the investigation/evidence plane only. It never
+actuates. Failover always runs through `agent/failover_tool.py`, a plain Python function
+with no Grafana dependency, gated on an explicit human-authorizer argument the model
+cannot itself originate.
+
+## Runtime call sites — Google Cloud and Grafana, actually invoked in code
+
+Both integrations are imported and instantiated at runtime, not just referenced in docs.
+Representative call site: `agent/gate5_diagnose_and_failover.py`
+
+**Google Cloud (Gemini via Vertex AI, through Google ADK):**
+```python
+# agent/gate5_diagnose_and_failover.py:23-27
+from google.adk.agents import Agent
+from google.adk.runners import InMemoryRunner
+from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
+from google.adk.tools.mcp_tool.mcp_session_manager import StreamableHTTPConnectionParams
+from google.genai import types
+...
+# line 97
+model="gemini-2.5-flash",
+```
+
+**Grafana (official `mcp-grafana` MCP server, streamable-http transport):**
+```python
+# agent/gate5_diagnose_and_failover.py:91-92
+grafana_toolset = MCPToolset(
+    connection_params=StreamableHTTPConnectionParams(url=MCP_URL),
+    ...
+```
+
+The same pattern repeats across `agent/gate1_reasoning_only.py` through
+`agent/gate5_diagnose_and_failover.py`, `agent/evidence_gate.py`, and
+`agent/failover_tool.py`. This is the alternative deployment path the Grafana MCP docs
+sanction for unattended/server-side agents (open-source MCP server + service-account
+token) rather than the browser-OAuth hosted `mcp.grafana.com` endpoint.
+
+## Prerequisites
+
+- Docker + Docker Compose
+- Python 3.10+ (a dedicated venv is recommended — ADK needs 3.10+; if your system Python
+  is older, install a newer one via `brew install python@3.12` or similar)
+- `ffmpeg` / `ffprobe` on your PATH
+- `envsubst` on your PATH (part of GNU gettext — `brew install gettext` on macOS if
+  missing; usually preinstalled on Linux)
+- A Google Cloud project with Vertex AI enabled, and `gcloud auth application-default
+  login` run once
+- A Grafana Cloud account (free tier works) — or run fully local against the bundled
+  Docker Grafana instance instead; see below
+
+## Setup — from a clean clone
+
+```bash
+git clone https://github.com/markbrazinski/changeover.git
+cd changeover
+
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install google-adk python-dotenv "mcp==1.29.0"
+
+cp .env.example .env
+# Edit .env: set GOOGLE_CLOUD_PROJECT to your GCP project.
+# Grafana Cloud fields are optional — leave them blank to stay fully local
+# (queries go against the bundled Docker Grafana instead of a real Cloud stack).
+
+gcloud auth application-default login
+```
+
+## Bring up the rig
+
+```bash
+./scripts/up.sh
+```
+
+This starts Grafana, Prometheus, Pushgateway, and two Grafana MCP server containers
+(one pointed at the local Docker Grafana, one at Grafana Cloud if configured) via
+`docker-compose.yml`, and waits for all of them to report healthy.
+
+- Local Grafana UI: http://localhost:3000 (admin/admin)
+- Local Prometheus: http://localhost:9090
+- Local MCP server: http://localhost:8000/mcp
+- Cloud-pointed MCP server: http://localhost:8001/mcp
+
+## Run the real fault-injection pipelines
+
+Each of these drives a real process (ffmpeg, a real HTTP server) to produce genuine
+telemetry — nothing here is a synthetic/injected number.
+
+```bash
+# Caption-sync delay from a real encoder switchover
+python scripts/transcode_with_telemetry.py baseline
+python scripts/transcode_with_telemetry.py encoder_switch
+
+# Sign-language feed freeze from a real killed ffmpeg process
+python scripts/sign_feed_with_telemetry.py baseline
+python scripts/sign_feed_with_telemetry.py frozen
+
+# Caption-generation upstream failure from a real HTTP 503 stub
+python scripts/caption_gen_service.py &        # healthy mode
+python scripts/caption_gen_with_telemetry.py baseline
+kill %1
+python scripts/caption_gen_service.py --fail &
+python scripts/caption_gen_with_telemetry.py failure
+```
+
+## Run the agent
+
+```bash
+export GRAFANA_MCP_URL="http://localhost:8001/mcp"   # or :8000 for fully local
+
+# Full diagnose-and-failover loop, gated on evidence availability/quality,
+# requires explicit human approval to actually execute a switch:
+python agent/gate5_diagnose_and_failover.py --approve
+```
+
+Without `--approve`, the agent will still investigate and recommend, but
+`failover_tool.py` will refuse to execute the switch — there is no path for the model to
+grant itself authorization.
+
+Inspect the result:
+```bash
+cat logs/gate5_result.json
+cat logs/feed_state.json   # real, append-only audit trail of every switch
+```
+
+## Before recording or presenting a live demo
+
+```bash
+python scripts/test-only/wipe_test_fixtures.py
+```
+
+Confirms no leftover test fixtures from `scripts/test-only/` are present in Pushgateway.
+See `scripts/test-only/README.md` for why this matters — a past contamination incident
+caused a real misdiagnosis during development.
+
+## Repository layout
+
+```
+agent/              Gemini/ADK agent scripts, evidence gate, failover tool
+scripts/            Real fault-injection pipelines (ffmpeg, HTTP stub)
+scripts/test-only/  Fixture-seeding scripts for testing the evidence gate in isolation —
+                     never run these against a rig you're about to demo from
+fixtures/           Source video and static test fixtures
+grafana/            Grafana provisioning config
+prometheus/         Prometheus scrape/remote_write config template
+docker-compose.yml  Full local rig: Grafana, Prometheus, Pushgateway, 2x MCP server
+```
+
+## License
+
+MIT — see [LICENSE](LICENSE).

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Crect x='9' y='9' width='54' height='54' rx='9' fill='none' stroke='%2316140f' stroke-width='6'/%3E%3Ccircle cx='47' cy='25' r='10.5' fill='%2316140f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#e7e4dd}
+  a{color:#16140f}a:hover{color:#5a5750}
+  button:focus-visible{outline:3px solid #b8641b;outline-offset:2px}
+</style>
+</helmet>
+<div style="display:grid;grid-template-columns:262px 1fr;min-height:100vh;font-family:'Space Grotesk',system-ui,sans-serif;color:#16140f">
+
+  <nav aria-label="Changeover states" style="background:#16140f;color:#f5f3ec;padding:20px 16px 24px;display:flex;flex-direction:column;gap:5px;position:sticky;top:0;align-self:start;height:100vh;box-sizing:border-box;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:9px;padding:0 4px 4px">
+      <span style="width:24px;height:24px;flex:none;color:#f5f3ec"><svg viewBox="0 0 72 72" fill="none" style="display:block;width:100%;height:100%"><rect x="9" y="9" width="54" height="54" rx="9" stroke="currentColor" stroke-width="6"/><circle cx="47" cy="25" r="10.5" fill="currentColor"/></svg></span>
+      <span style="font:700 15px 'Space Mono',monospace;letter-spacing:3px">CHANGEOVER</span>
+    </div>
+    <div style="font:400 8px 'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;color:rgba(245,243,236,.5);padding:0 4px 10px">High-fidelity · 12 states</div>
+
+    <div style="font:700 8px 'Space Mono',monospace;letter-spacing:1.2px;text-transform:uppercase;color:rgba(245,243,236,.5);padding:8px 4px 5px">Incident path</div>
+    <sc-for list="{{ pathStates }}" as="s" hint-placeholder-count="8">
+      <button type="button" onClick="{{ s.go }}" style="{{ s.btnStyle }}">
+        <span style="font:700 9px 'Space Mono',monospace;opacity:.6;min-width:15px">{{ s.num }}</span>
+        <span style="font:600 11px 'Space Grotesk';letter-spacing:.2px">{{ s.label }}</span>
+        <sc-if value="{{ s.refuseTag }}"><span style="margin-left:auto;font:700 7px 'Space Mono',monospace;letter-spacing:.5px;border:1px solid currentColor;border-radius:3px;padding:1px 4px">REFUSE</span></sc-if>
+      </button>
+    </sc-for>
+
+    <div style="font:700 8px 'Space Mono',monospace;letter-spacing:1.2px;text-transform:uppercase;color:rgba(245,243,236,.5);padding:14px 4px 5px">System states</div>
+    <sc-for list="{{ sysStates }}" as="s" hint-placeholder-count="4">
+      <button type="button" onClick="{{ s.go }}" style="{{ s.btnStyle }}">
+        <span style="font:700 9px 'Space Mono',monospace;opacity:.6;min-width:15px">+</span>
+        <span style="font:600 11px 'Space Grotesk';letter-spacing:.2px">{{ s.label }}</span>
+      </button>
+    </sc-for>
+
+    <a href="Changeover Muted-Gate Report.dc.html" style="margin-top:16px;text-decoration:none;display:flex;align-items:center;gap:7px;padding:10px 11px;border:1.5px solid rgba(245,243,236,.4);border-radius:7px;color:#f5f3ec;font:700 8.5px 'Space Mono',monospace;letter-spacing:.5px;text-transform:uppercase">← Muted-gate report →</a>
+    <div style="margin-top:auto;padding:14px 4px 0;font:400 7px 'Space Mono',monospace;line-height:1.6;color:rgba(245,243,236,.42)">↑ ↓ / ← → to walk states · deep-links via #hash · logged-out replay</div>
+  </nav>
+
+  <main style="padding:30px 40px 60px;display:flex;flex-direction:column;min-width:0">
+    <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:26px">
+      <div style="flex:1;min-width:280px">
+        <div style="font:700 9px 'Space Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,.45)">{{ curKicker }}</div>
+        <h1 style="font:600 30px/1.05 'Space Grotesk';letter-spacing:-1px;margin:7px 0 6px">{{ curTitle }}</h1>
+        <p style="font:400 13px/1.55 system-ui;color:rgba(0,0,0,.62);margin:0;max-width:640px">{{ curJob }}</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <button type="button" onClick="{{ toggleGray }}" aria-pressed="{{ gray }}" style="{{ grayBtnStyle }}">
+          <span style="font:700 9px 'Space Mono',monospace;letter-spacing:.5px;text-transform:uppercase">Capture gate · desaturate</span>
+        </button>
+        <div style="display:flex;gap:7px">
+          <button type="button" onClick="{{ prev }}" aria-label="Previous state" style="font:700 12px 'Space Mono',monospace;padding:6px 13px;border:1.5px solid #16140f;border-radius:6px;background:#f5f3ec;color:#16140f;cursor:pointer">←</button>
+          <button type="button" onClick="{{ next }}" aria-label="Next state" style="font:700 12px 'Space Mono',monospace;padding:6px 13px;border:1.5px solid #16140f;border-radius:6px;background:#f5f3ec;color:#16140f;cursor:pointer">→</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="{{ stageStyle }}">
+      <dc-import name="Changeover Frame" state="{{ current }}" offset="10.93" baseline="0.043" hint-size="760px,340px"></dc-import>
+    </div>
+
+    <div style="margin-top:20px;display:inline-flex;align-self:flex-start;align-items:center;gap:8px;font:600 9px 'Space Mono',monospace;letter-spacing:.4px;text-transform:uppercase;color:rgba(0,0,0,.5)">
+      <span style="width:18px;height:18px;border-radius:4px;background:{{ gateColor }};color:#f5f3ec;display:grid;place-items:center;font:800 10px 'Space Mono',monospace">{{ gateMark }}</span>
+      Muted-gate read at 640px: {{ gateRead }}
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  ORDER = ['rest','failure','investigating','verified','approval','changed','refuse-switch','refuse-guess','loading','empty','error','correction'];
+  META = {
+    rest:          {num:'1', label:'At rest',            kicker:'State 1 · cold-open',        title:'AT REST',            job:'The green-lie: the show looks healthy to everyone. Honest non-✓ — there is nothing to diagnose yet.', gate:['pass','Both sides look calm — nothing wrong, and that reads.']},
+    failure:       {num:'2', label:'Failure detected',   kicker:'State 2 · failure fires',    title:'FAILURE DETECTED',   job:'Captions freeze on this viewer; offset climbs; the CAP lane goes heavy while the board stays green.', gate:['pass','Right feed + CAP lane flip heavy in one cut — fine / stranded reads instantly.']},
+    investigating: {num:'3', label:'Investigating',      kicker:'State 3 · fan-out · the moat',title:'INVESTIGATING',      job:'The lane strip expands for one beat; peers are ruled out; the spine cites caption_sync +10.93s and points at captions.', gate:['pass','Lane expansion is a shape change — differentiation reads muted.']},
+    verified:      {num:'4', label:'Backup verified',    kicker:'State 4 · zoom + verify',    title:'BACKUP VERIFIED',    job:'The named failure is confirmed; the spine ffprobe-verifies a healthy backup feed — safe to offer the switch.', gate:['pass','Spine names the failure and shows backup — ✓ agent-working reads.']},
+    approval:      {num:'5', label:'Awaiting approval',  kicker:'State 5 · human gate',       title:'AWAITING APPROVAL',  job:'The agent halts and summons a human. Approve / hold sits in the spine: it will not switch without you.', gate:['pass','Approve/Hold control is the loudest new object — the gate reads.']},
+    changed:       {num:'6', label:'Changed over',       kicker:'State 6 · changeover + audit',title:'CHANGED OVER',       job:'Switched onto the healthy backup — captions resume on the same viewer; access restored; the audit entry closes the loop.', gate:['pass','Stranded → restored on the same box; audit line confirms it.']},
+    'refuse-switch':{num:'7',label:'Refusal — won’t switch',kicker:'State 7 · refusal on the action',title:'REFUSAL — WON’T SWITCH',job:'A backup exists but its sync is unconfirmable, so the agent halts at the gate. The split and lanes stay fully intact — the refusal lands on the action.', gate:['pass','Evidence intact, action stopped — double-border on the switch step. Distinct from 8.']},
+    'refuse-guess':{num:'8', label:'Refusal — won’t guess',kicker:'State 8 · refusal on diagnosis · CLIMAX',title:'REFUSAL — WON’T GUESS',job:'The evidence plane goes dark; the lanes ghost out. The spine stays solid and keeps reasoning, refusing to fabricate a diagnosis. “Which layer” is intentionally unreadable — that unreadability is the proof.', gate:['flag','INTENTIONAL non-✓ on “which layer”: lanes ghost by design. Evidence-blind (vs 7’s action-stop) reads by the ghosted strip + solid spine.']},
+    loading:       {num:'+', label:'Loading',            kicker:'System · mid-query',         title:'LOADING',            job:'Mid-query: the agent is reaching for telemetry. Reads working, not broken — an active spine with no conclusions yet.', gate:['pass','Active scan + pending step read as “working”, not a failure.']},
+    empty:         {num:'+', label:'Empty',              kicker:'System · monitoring live',   title:'EMPTY',              job:'Monitoring live with zero incidents — an invitation, not a dead screen. The watch is alive; nothing to act on.', gate:['pass','Pulse + “0 incidents” invitation reads alive, not blank.']},
+    error:         {num:'+', label:'Error',              kicker:'System · surface fault',     title:'ERROR',              job:'A UI surface failed — the live preview render — distinct from state 8’s evidence-blind. It says what failed and the operator’s next action; telemetry is unaffected.', gate:['flag','Watch vs state 8: here telemetry is FINE and one surface errored (retry offered) — not an evidence blackout. The error tile + Retry carry the distinction.']},
+    correction:    {num:'+', label:'Correction',         kicker:'System · revised call',      title:'CORRECTION',         job:'A prior call is revised on new evidence — SIGN is now also degrading. The correction is appended below the original, never overwritten.', gate:['pass','Two stacked rows (prior stands / correction appended) read as revision, not erasure.']},
+  };
+
+  state = { current: 'investigating', gray: false };
+
+  componentDidMount(){
+    const fromHash = () => {
+      const h = (location.hash || '').replace('#','');
+      if (this.ORDER.includes(h)) this.setState({current: h});
+    };
+    fromHash();
+    this._hash = fromHash; window.addEventListener('hashchange', this._hash);
+    this._key = (e) => {
+      if (['ArrowDown','ArrowRight'].includes(e.key)){ e.preventDefault(); this.step(1); }
+      else if (['ArrowUp','ArrowLeft'].includes(e.key)){ e.preventDefault(); this.step(-1); }
+    };
+    window.addEventListener('keydown', this._key);
+  }
+  componentWillUnmount(){ window.removeEventListener('hashchange', this._hash); window.removeEventListener('keydown', this._key); }
+
+  set(k){ this.setState({current:k}); try{ history.replaceState(null,'','#'+k); }catch(e){} }
+  step(d){ const i = this.ORDER.indexOf(this.state.current); const n = (i + d + this.ORDER.length) % this.ORDER.length; this.set(this.ORDER[n]); }
+
+  btn(k){
+    const on = this.state.current === k;
+    return 'display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:8px 11px;border-radius:7px;cursor:pointer;border:1.5px solid '+(on?'#f5f3ec':'transparent')+';background:'+(on?'#f5f3ec':'transparent')+';color:'+(on?'#16140f':'#f5f3ec')+";font-family:'Space Grotesk';";
+  }
+
+  renderVals(){
+    const cur = this.state.current, m = this.META[cur], gray = this.state.gray;
+    const mk = (k) => ({ key:k, num:this.META[k].num, label:this.META[k].label, refuseTag:k.startsWith('refuse'), btnStyle:this.btn(k), go:()=>this.set(k) });
+    const [flag, read] = m.gate;
+    return {
+      pathStates: this.ORDER.slice(0,8).map(mk),
+      sysStates: this.ORDER.slice(8).map(mk),
+      current: cur,
+      curKicker: m.kicker, curTitle: m.title, curJob: m.job,
+      gray, toggleGray: ()=>this.setState(s=>({gray:!s.gray})),
+      prev: ()=>this.step(-1), next: ()=>this.step(1),
+      grayBtnStyle: 'display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:7px;cursor:pointer;border:1.5px solid #16140f;background:'+(gray?'#16140f':'#f5f3ec')+';color:'+(gray?'#f5f3ec':'#16140f')+';',
+      stageStyle: 'align-self:stretch;max-width:100%;overflow-x:auto;padding:26px 30px;border-radius:14px;background:#efece4;border:1px solid rgba(0,0,0,.12);'+(gray?'filter:grayscale(1) contrast(1.05);':''),
+      gateMark: flag==='pass' ? '✓' : '!',
+      gateColor: flag==='pass' ? '#2f6a41' : '#b8641b',
+      gateRead: read,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "snapshot_id": "C",
+  "window": "2026-08-01T20:00:00Z to 2026-08-01T20:05:00Z",
+  "layers": {
+    "captions": {
+      "layer_up": [1, 1, 1, 0, 0, 0, 0],
+      "caption_sync_offset_seconds": [0.05, 0.06, 0.05, null, null, null, null],
+      "packager_queue_depth": [2, 2, 3, 0, 0, 0, 0]
+    },
+    "sign_language": {
+      "layer_up": 1,
+      "sign_feed_freshness_seconds": [0.19, 0.2, 0.2, 0.21, 0.2, 0.19, 0.2]
+    },
+    "audio_description": {
+      "layer_up": 1
+    },
+    "caption_generation_upstream": {
+      "caption_gen_success_rate": [1.0, 0.97, 0.6, 0.05, 0.0, 0.0, 0.0],
+      "caption_gen_error_rate": [0.0, 0.03, 0.4, 0.95, 1.0, 1.0, 1.0],
+      "caption_gen_errors_sample": ["", "timeout", "timeout", "upstream 503", "upstream 503", "upstream 503", "upstream 503"]
+    }
+  },
+  "notes": "Values are per-minute samples across the window, oldest first."
+}
