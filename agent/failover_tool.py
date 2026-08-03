@@ -22,7 +22,6 @@ import time
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-STATE_PATH = os.path.join(os.path.dirname(__file__), "..", "logs", "feed_state.json")
 MCP_URL = os.environ.get("GRAFANA_MCP_URL", "http://localhost:8001/mcp")
 DATASOURCE_UID = "grafanacloud-prom"
 
@@ -40,15 +39,34 @@ BACKUP_FRESHNESS_FAULT_THRESHOLD_SECONDS = 3.0
 BACKUP_CAPTION_OFFSET_FAULT_THRESHOLD_SECONDS = 4.0
 
 
-def read_state() -> dict:
-    if not os.path.exists(STATE_PATH):
-        return {"layer": None, "active_feed": "primary", "history": []}
-    with open(STATE_PATH) as f:
+def state_path(channel: str | None = None) -> str:
+    """PER-CHANNEL state (T0). One global feed_state.json cannot represent N channels: with
+    two channels appending to a single history, "which feed is this channel on right now?"
+    has no answer, and a supervisor arbitrating across channels would read another
+    channel's active_feed as its own.
+
+    Channels get logs/feed_state_<channel>.json. With no channel registered the path is the
+    original logs/feed_state.json, so the pre-generalization single-channel behaviour and
+    its existing history are untouched.
+    """
+    ch = channel if channel is not None else CHANNEL
+    logs = os.path.join(os.path.dirname(__file__), "..", "logs")
+    if ch:
+        return os.path.join(logs, f"feed_state_{ch}.json")
+    return os.path.join(logs, "feed_state.json")
+
+
+def read_state(channel: str | None = None) -> dict:
+    path = state_path(channel)
+    if not os.path.exists(path):
+        return {"channel": channel if channel is not None else CHANNEL,
+                "layer": None, "active_feed": "primary", "history": []}
+    with open(path) as f:
         return json.load(f)
 
 
-def write_state(state: dict):
-    with open(STATE_PATH, "w") as f:
+def write_state(state: dict, channel: str | None = None):
+    with open(state_path(channel), "w") as f:
         json.dump(state, f, indent=2)
 
 
@@ -67,6 +85,9 @@ _registry = None
 if CHANNEL:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "config"))
     import channels as _registry
+
+# Resolved for the channel this process runs as; defined after CHANNEL so it is concrete.
+STATE_PATH = state_path(CHANNEL)
 
 _LEGACY_BACKUP = os.path.join(os.path.dirname(__file__), "..", "fixtures", "source.mp4")
 
@@ -208,10 +229,14 @@ def failover(layer: str, reason: str, authorized_by: str) -> dict:
     prior_feed = state.get("active_feed", "primary")
     new_feed = "backup" if prior_feed == "primary" else "primary"
 
+    state["channel"] = CHANNEL
     state["layer"] = layer
     state["active_feed"] = new_feed
     state.setdefault("history", []).append({
         "timestamp": time.time(),
+        # Which channel this switch belongs to. Without it, two channels' switches in one
+        # history are indistinguishable -- the exact ambiguity per-channel state removes.
+        "channel": CHANNEL,
         "layer": layer,
         "from": prior_feed,
         "to": new_feed,

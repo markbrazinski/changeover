@@ -26,6 +26,10 @@ CEILINGS_PATH = os.path.join(ROOT, "config", "ceilings.json")
 # readable from the file's OWN metadata, not asserted from outside knowledge.
 CHANNELS = {
     "tears_of_steel": {
+        "criticality_tier": "premium",
+        "tier_rationale": ("Flagship live channel -- largest audience and primary "
+                           "emergency-information carrier."),
+        "tier_source": "operator-declared",
         "title": "Tears of Steel (2012), Blender Foundation",
         "license": "CC BY 3.0",
         "license_verified_in_file": True,
@@ -39,6 +43,10 @@ CHANNELS = {
         ),
     },
     "sintel": {
+        "criticality_tier": "standard",
+        "tier_rationale": ("Secondary channel -- degraded-and-flagged is acceptable "
+                           "under contention."),
+        "tier_source": "operator-declared",
         "title": "Sintel (2010), Blender Foundation",
         "license": "CC BY 3.0",
         "license_verified_in_file": False,
@@ -52,6 +60,46 @@ CHANNELS = {
 }
 
 LAYERS = ("captions", "sign_language")
+
+# --- Contention model (Phase 2) -------------------------------------------------------
+#
+# CRITICALITY TIER IS AN OPERATOR-DECLARED POLICY INPUT, NOT A MEASUREMENT. Each channel's
+# `criticality_tier` above is supplied by the facility operator and is recorded with its
+# rationale and `tier_source: "operator-declared"`, exactly as film licenses are recorded
+# with whether they were verified in-file or asserted. Nothing in this repo measures or
+# derives criticality, and nothing should present it as derived: in a real broadcast
+# facility, "premium 1+1 vs standard N+M" is a commercial decision, not a property of the
+# signal. Labelling it honestly is what keeps the allocation defensible.
+#
+# Ranking is by tier only. TIER_RANK exists solely to make "premium outranks standard" a
+# total order the supervisor can sort on; it is a restatement of the declared tiers, not an
+# independent judgement.
+TIER_RANK = {"premium": 0, "standard": 1}
+
+# Shared backup pool size (M). Real scarcity means M < the number of channels that can
+# concurrently fail (N). With N=2 channels and M=1, two concurrent incidents genuinely
+# cannot both be protected -- the shortage is structural, not staged for the demo.
+BACKUP_POOL_CAPACITY = int(os.environ.get("CHANGEOVER_BACKUP_POOL", "1"))
+
+
+def criticality_tier(channel: str) -> str:
+    return CHANNELS[channel]["criticality_tier"]
+
+
+def tier_rank(channel: str) -> int:
+    """Lower sorts first (higher priority). Unknown tiers sort last rather than raising, so
+    a newly added channel can never silently outrank a declared premium one."""
+    return TIER_RANK.get(criticality_tier(channel), len(TIER_RANK))
+
+
+def tier_provenance(channel: str) -> dict:
+    meta = CHANNELS[channel]
+    return {
+        "criticality_tier": meta["criticality_tier"],
+        "tier_rationale": meta["tier_rationale"],
+        "tier_source": meta["tier_source"],
+        "measured_or_derived": False,
+    }
 
 
 def channel_dir(channel: str) -> str:
