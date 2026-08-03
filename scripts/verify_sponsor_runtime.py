@@ -96,6 +96,62 @@ def runtime_evidence() -> list:
     return out
 
 
+def per_channel_evidence() -> list:
+    """Both sponsors must be exercised for EVERY registered channel, not just once overall.
+    A channel passes only if some run of its own produced BOTH a real Grafana MCP call
+    (with a measured latency) and a real Gemini reply. Returns [] when no channel registry
+    is available, so the single-channel setup still verifies as before."""
+    try:
+        sys.path.insert(0, os.path.join(ROOT, "config"))
+        import channels as registry
+    except Exception:
+        return []
+
+    logs = os.path.join(ROOT, "logs")
+    trace_dir = os.path.join(logs, "traces")
+    out = []
+
+    for ch in registry.available_channels():
+        jobs = set(registry.job_name(ch, l) for l in registry.LAYERS)
+
+        grafana_calls, gemini_chars = 0, 0
+        for name in sorted(os.listdir(logs)):
+            if not (name.startswith("assembled_") and name.endswith(".json")):
+                continue
+            with open(os.path.join(logs, name)) as f:
+                r = json.load(f)
+            if r.get("channel") != ch:
+                continue
+            if (r.get("answer") or "").strip() and not r.get("refused"):
+                gemini_chars = max(gemini_chars, len((r.get("answer") or "").strip()))
+            scenario = r.get("scenario", "")
+            tp = os.path.join(trace_dir, f"trace_{scenario}.json")
+            if os.path.exists(tp):
+                with open(tp) as f:
+                    t = json.load(f)
+                grafana_calls += sum(
+                    1 for rec in (t.get("records") or [])
+                    if rec.get("tool") in ("query_prometheus", "list_datasources",
+                                           "list_prometheus_label_values")
+                    and rec.get("latency_ms")
+                )
+
+        ok = grafana_calls > 0 and gemini_chars > 0
+        out.append({
+            "channel": ch,
+            "ok": ok,
+            "grafana_mcp_calls": grafana_calls,
+            "gemini_reply_chars": gemini_chars,
+            "channel_jobs": sorted(jobs),
+            "detail": (f"{grafana_calls} real MCP calls + a {gemini_chars}-char Gemini "
+                       f"reply from this channel's own runs"
+                       if ok else
+                       f"insufficient runtime evidence (mcp_calls={grafana_calls}, "
+                       f"gemini_chars={gemini_chars})"),
+        })
+    return out
+
+
 if __name__ == "__main__":
     static = static_evidence()
     runtime = runtime_evidence()
@@ -110,13 +166,22 @@ if __name__ == "__main__":
     for r in runtime:
         print(f"  [{'OK  ' if r['ok'] else 'MISS'}] {r['sponsor']}\n         {r['detail']}")
 
-    result = {"static": static, "runtime": runtime}
+    per_channel = per_channel_evidence()
+    if per_channel:
+        print("\n=== PER-CHANNEL runtime evidence ===")
+        for c in per_channel:
+            print(f"  [{'OK  ' if c['ok'] else 'MISS'}] {c['channel']}\n         {c['detail']}")
+
+    result = {"static": static, "runtime": runtime, "per_channel": per_channel}
     with open(os.path.join(ROOT, "logs", "sponsor_runtime_evidence.json"), "w") as f:
         json.dump(result, f, indent=2)
 
-    failed = [f for f in static if not f["found"]] + [r for r in runtime if not r["ok"]]
+    failed = ([f for f in static if not f["found"]]
+              + [r for r in runtime if not r["ok"]]
+              + [c for c in per_channel if not c["ok"]])
     print()
     if failed:
         print(f"FAILED: {len(failed)} sponsor check(s) did not pass")
         sys.exit(1)
-    print("both sponsors verified: imported, called in code, and exercised at runtime")
+    scope = f" across {len(per_channel)} channel(s)" if per_channel else ""
+    print(f"both sponsors verified: imported, called in code, and exercised at runtime{scope}")
