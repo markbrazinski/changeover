@@ -40,10 +40,20 @@ import time
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(ROOT, "fixtures", "source.mp4")
 PUSHGATEWAY = "http://localhost:9091"
-JOB = "media_pipeline_feed_liveness"
 LAYER = "sign_language"
+
+# Channel selection -- see the note in scripts/caption_cue_with_telemetry.py. Each channel
+# monitors ITS OWN film, so the stand-in feeds are genuinely distinct across channels.
+CHANNEL = os.environ.get("CHANGEOVER_CHANNEL")
+if CHANNEL:
+    sys.path.insert(0, os.path.join(ROOT, "config"))
+    import channels as _ch
+    SRC = _ch.program_path(CHANNEL)
+    JOB = _ch.job_name(CHANNEL, "sign_language")
+else:
+    SRC = os.path.join(ROOT, "fixtures", "source.mp4")
+    JOB = "media_pipeline_feed_liveness"
 
 PROGRESS_RE = re.compile(r"out_time_ms=(\d+)")
 
@@ -120,6 +130,40 @@ def baseline():
     reader.join(timeout=2)
 
 
+def hold_healthy(seconds: float, interval_s: float = 5.0):
+    """Keeps a HEALTHY liveness exporter alive and pushing for `seconds`.
+
+    Needed whenever this layer is the peer being ruled out: a finite baseline run that has
+    exited is a genuinely DEAD exporter, and agent/evidence_gate.py refuses on it (tier=
+    stale) before any diagnosis happens -- which tests the gate rather than the behaviour
+    under test. The feed keeps really running, so the liveness value stays at its real
+    healthy level; nothing is held constant or asserted.
+    """
+    tracker = LastFrameTracker()
+    out = os.path.join(ROOT, "fixtures", ".liveness_healthy_probe.mp4")
+    proc = run_live_paced(0, seconds + 15, out)
+    reader = threading.Thread(target=frame_reader, args=(proc, tracker), daemon=True)
+    reader.start()
+
+    print(f"  holding HEALTHY liveness exporter open for {seconds:.0f}s")
+    idx = 0
+    deadline = time.time() + seconds
+    while time.time() < deadline:
+        time.sleep(interval_s)
+        # If the film runs out, restart the feed so it stays genuinely healthy rather than
+        # drifting into a fault we did not intend to inject.
+        if proc.poll() is not None:
+            proc = run_live_paced(0, seconds + 15, out)
+            reader = threading.Thread(target=frame_reader, args=(proc, tracker), daemon=True)
+            reader.start()
+            continue
+        push_sample(tracker.liveness(), "baseline", idx, frozen=0)
+        idx += 1
+
+    proc.kill()
+    reader.join(timeout=2)
+
+
 def frozen_fault(hold_seconds: float = 0.0):
     print("=== FAULT: stand-in feed process genuinely killed mid-stream (real SIGKILL) ===")
     tracker = LastFrameTracker()
@@ -161,6 +205,10 @@ if __name__ == "__main__":
     elif mode == "frozen":
         hold = float(sys.argv[2]) if len(sys.argv) > 2 else 0.0
         frozen_fault(hold)
+    elif mode == "hold_healthy":
+        seconds = float(sys.argv[2]) if len(sys.argv) > 2 else 180.0
+        hold_healthy(seconds)
     else:
-        print("usage: python feed_liveness_with_telemetry.py <baseline|frozen [hold_seconds]>")
+        print("usage: python feed_liveness_with_telemetry.py "
+              "<baseline|frozen [hold_seconds]|hold_healthy [seconds]>")
         sys.exit(1)

@@ -232,6 +232,78 @@ python scripts/verify_sponsor_runtime.py       # both sponsors: imported, called
 python agent/assembled_agent.py --scenario demo --approve --verify
 ```
 
+## Channels — the same agent, instanced N-wide
+
+The assembled agent runs per channel. A channel is a real film plus its own sidecar, its own
+**distinct** backup, its own Prometheus jobs and its own **derived** ceilings. Switching
+channels changes only `CHANGEOVER_CHANNEL`; **no agent logic branches on it.**
+
+```bash
+./scripts/run_nwide_acceptance.sh                  # every available channel
+./scripts/run_nwide_acceptance.sh tears_of_steel   # one channel
+```
+
+### N-wide acceptance (real runs, real films)
+
+| Beat | tears_of_steel | sintel |
+|---|---|---|
+| happy path + verify-by-measurement | **PASS** restored 0.5011 s ≤ 0.7589 s | **PASS** restored 0.5011 s ≤ 0.7550 s |
+| captions-vs-feed-liveness discrimination | **PASS** → `sign_language` @ 45.51 s | **PASS** → `sign_language` @ 25.46 s |
+| won't guess (MCP down) | **PASS** `tier=unavailable`, no layer named | **PASS** `tier=unavailable`, no layer named |
+| won't switch (unconfirmed backup) | **PASS** approved, attempted, refused | **PASS** approved, attempted, refused |
+
+### The films
+
+| Channel | Film | License | Duration | Notes |
+|---|---|---|---|---|
+| `tears_of_steel` | Tears of Steel (2012), Blender Foundation | CC BY 3.0 — **read from the file's own metadata** | 734.12 s | 864×360; a low-res transcode despite `1080p` in the supplied filename. Aspect 2.40:1 is correct. Resolution is irrelevant — no pixels are read. |
+| `sintel` | Sintel (2010), Blender Foundation | CC BY 3.0 — **asserted from known publication terms, not embedded in the file** | 888.06 s | 2048×872 |
+
+Each channel's `backup.mp4` is cut from the **other** film, so no channel's backup shares a
+source file with its own primary.
+
+### Derived ceilings (T3 — never hand-set)
+
+`scripts/derive_ceilings.py` runs each channel's real producers against its real film and
+writes `config/ceilings.json`:
+
+```
+ceiling = observed_baseline_max × 1.5
+```
+
+Max-times-a-factor rather than a percentile because the caption offset is a **sawtooth** —
+it ramps to roughly one cue interval and resets on every publish, so the max *is* the
+physically meaningful bound and a percentile would clip legitimate peaks.
+
+| Channel | captions | sign_language (feed-liveness) |
+|---|---|---|
+| tears_of_steel | 0.7589 s (max 0.5059) | 0.6119 s (max 0.4080) |
+| sintel | 0.7550 s (max 0.5034) | 0.5961 s (max 0.3974) |
+
+All are **tighter** than the 1.5 s hand-set value they replace.
+
+## Adding a film (drop-in spec)
+
+Films are **never committed** (`.gitignore` blanket-excludes video). Supply them out-of-band
+at:
+
+```
+fixtures/films/<channel_id>/
+├── program.mp4        # the film
+├── backup.mp4         # DISTINCT backup — must not be the same file as program.mp4
+└── captions.en.vtt    # sidecar (scripts/author_caption_sidecar.py can generate one)
+```
+
+- **`program.mp4` / `backup.mp4`** — MP4 (H.264 + AAC), any resolution/aspect, **≥ 90 s**,
+  any real frame rate. Anything `ffprobe` reports a duration for and `ffmpeg -re` can
+  transcode will work.
+- **`captions.en.vtt`** — WebVTT, UTF-8, `HH:MM:SS.mmm --> HH:MM:SS.mmm`, **≥ 20 cues**,
+  monotonic, first cue ≤ 5 s, ~2 s cadence with ~0.5 s gaps, spanning most of the film's
+  duration. Cadence is load-bearing: it sets the healthy-offset ceiling.
+
+Then register it in `config/channels.py` (title, license, and **whether the license is
+verifiable in the file itself**) and run `python scripts/derive_ceilings.py <channel_id>`.
+
 ## The two instrumented layers
 
 Exactly two layers are instrumented. **Audio description is not instrumented** — there is

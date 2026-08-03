@@ -52,22 +52,52 @@ ROOT = os.path.join(os.path.dirname(__file__), "..")
 # The two instrumented layers, and the real, fully-scoped queries that address them.
 # Every expression pins BOTH job and mode -- the scope guard enforces this, and it is what
 # stops a healthy sibling series from answering for a faulted one.
-LAYERS = {
-    "captions": {
-        "job": "media_pipeline_captions",
-        "fault_mode": "frozen_captions",
-        "metric": "caption_cue_sync_offset_seconds",
-        "flag_metric": "caption_cue_publisher_stalled",
-        "quantity": "caption cue timestamp vs program clock",
-    },
-    "sign_language": {
-        "job": "media_pipeline_feed_liveness",
-        "fault_mode": "frozen",
-        "metric": "feed_liveness_seconds",
-        "flag_metric": "feed_frozen",
-        "quantity": "seconds since the feed process last produced a frame (stand-in feed)",
-    },
-}
+# Channel selection (generalization phase). CHANGEOVER_CHANNEL names a registered channel
+# whose real film, sidecar, distinct backup, Prometheus jobs and DERIVED ceilings come from
+# config/channels.py. The agent's diagnostic logic is identical either way -- only which
+# jobs it queries and which ceilings it verifies against change. That is precisely what
+# "the same agent, instanced per channel" means; there is no per-channel branching below.
+CHANNEL = os.environ.get("CHANGEOVER_CHANNEL")
+_registry = None
+if CHANNEL:
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "config"))
+    import channels as _registry
+
+
+def _build_layers() -> dict:
+    if _registry:
+        out = {}
+        for layer in _registry.LAYERS:
+            names = _registry.metric_names(layer)
+            out[layer] = {
+                "job": _registry.job_name(CHANNEL, layer),
+                "fault_mode": names["fault_mode"],
+                "metric": names["metric"],
+                "flag_metric": names["flag"],
+                "quantity": ("caption cue timestamp vs program clock" if layer == "captions"
+                             else "seconds since the feed process last produced a frame "
+                                  "(stand-in feed)"),
+            }
+        return out
+    return {
+        "captions": {
+            "job": "media_pipeline_captions",
+            "fault_mode": "frozen_captions",
+            "metric": "caption_cue_sync_offset_seconds",
+            "flag_metric": "caption_cue_publisher_stalled",
+            "quantity": "caption cue timestamp vs program clock",
+        },
+        "sign_language": {
+            "job": "media_pipeline_feed_liveness",
+            "fault_mode": "frozen",
+            "metric": "feed_liveness_seconds",
+            "flag_metric": "feed_frozen",
+            "quantity": "seconds since the feed process last produced a frame (stand-in feed)",
+        },
+    }
+
+
+LAYERS = _build_layers()
 
 
 def scoped_queries(layer: str) -> list:
@@ -133,17 +163,20 @@ to call list_datasources at all, since the uid is given to you here.
 
 EXACTLY TWO layers are instrumented. Each is measured by a DIFFERENT physical quantity:
 
-  captions       job="media_pipeline_captions", mode="frozen_captions"
+  captions       job="{LAYERS['captions']['job']}", mode="{LAYERS['captions']['fault_mode']}"
                  caption_cue_sync_offset_seconds -- how far the program clock has advanced
                  past the media timestamp of the last published caption cue. Small and
                  bounded when healthy; climbs without bound when the cue publisher dies.
                  caption_cue_publisher_stalled -- whether the cue publisher has stopped.
 
-  sign_language  job="media_pipeline_feed_liveness", mode="frozen"
+  sign_language  job="{LAYERS['sign_language']['job']}", mode="{LAYERS['sign_language']['fault_mode']}"
                  feed_liveness_seconds -- seconds since the monitored feed process last
                  produced a frame. This measures FEED LIVENESS on a stand-in feed; it is
                  NOT a sign-language-content measurement. Do not describe it as one.
                  feed_frozen -- whether that feed process has stopped producing frames.
+
+Use EXACTLY these job names. They are channel-specific and are the only jobs that carry
+this channel's telemetry; any other job name returns no data.
 
 Audio description is NOT instrumented. You have no telemetry for it. If asked about it,
 say you cannot assess it. Never infer or report an audio-description diagnosis.
@@ -262,7 +295,12 @@ async def run(scenario: str, approve: bool, verify: bool, mcp_url: str) -> dict:
         HUMAN_APPROVAL["authorized_by"] = None
         print("[HUMAN] No approval granted -- agent may recommend but failover_tool will refuse")
 
-    result = {"scenario": scenario, "human_approved": approve, "mcp_url": mcp_url}
+    result = {"scenario": scenario, "human_approved": approve, "mcp_url": mcp_url,
+              "channel": CHANNEL,
+              "channel_jobs": {l: s["job"] for l, s in LAYERS.items()}}
+    if CHANNEL:
+        print(f"[CHANNEL] {CHANNEL} -- "
+              + ", ".join(f"{l}:{s['job']}" for l, s in LAYERS.items()))
 
     # --- Evidence gate (proven module, unmodified) -------------------------------------
     # Presence/liveness check, mode-agnostic (see evidence_queries docstring).
@@ -358,8 +396,16 @@ async def run(scenario: str, approve: bool, verify: bool, mcp_url: str) -> dict:
         if layer in LAYERS:
             print(f"\n[VERIFY] swap executed for '{layer}' -- confirming by real post-swap "
                   f"measurement before claiming restoration...")
-            # Healthy ceiling per layer, from the real measured baselines (see README).
-            ceiling = 1.5 if layer == "captions" else 1.5
+            # Ceiling is DERIVED from this channel's own observed baseline
+            # (config/ceilings.json via scripts/derive_ceilings.py), never hand-set. Without
+            # a registered channel there is no derived baseline to appeal to, so the legacy
+            # single-channel value is used and labelled as such.
+            if _registry:
+                ceiling = _registry.ceiling_for(CHANNEL, layer)
+                print(f"[VERIFY] derived ceiling for {CHANNEL}/{layer}: {ceiling}s")
+            else:
+                ceiling = 1.5
+                print("[VERIFY] no channel registered -- using legacy hand-set ceiling 1.5s")
             result["verify_by_measurement"] = await verify_by_measurement(
                 layer, timeout_s=90.0, poll_s=10.0, baseline_ceiling=ceiling
             )

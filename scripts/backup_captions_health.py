@@ -24,10 +24,21 @@ sys.path.insert(0, os.path.join(ROOT, "scripts"))
 from caption_cue_with_telemetry import parse_vtt_cues  # noqa: E402  (real reuse, same math)
 
 PUSHGATEWAY = "http://localhost:9091"
-JOB = "backup_captions"
 
-BACKUP_VIDEO = os.path.join(ROOT, "fixtures", "source.mp4")
-BACKUP_VTT = os.path.join(ROOT, "fixtures", "captions", "placeholder.en.vtt")
+# Channel selection. Each channel's backup is a DISTINCT file cut from a different film
+# than its own primary, so this exporter measures genuinely independent media per channel
+# -- the shared-backup gap is closed by construction, not by convention.
+CHANNEL = os.environ.get("CHANGEOVER_CHANNEL")
+if CHANNEL:
+    sys.path.insert(0, os.path.join(ROOT, "config"))
+    import channels as _ch
+    JOB = _ch.backup_job_name(CHANNEL, "captions")
+    BACKUP_VIDEO = _ch.backup_path(CHANNEL)
+    BACKUP_VTT = _ch.vtt_path(CHANNEL)
+else:
+    JOB = "backup_captions"
+    BACKUP_VIDEO = os.path.join(ROOT, "fixtures", "source.mp4")
+    BACKUP_VTT = os.path.join(ROOT, "fixtures", "captions", "placeholder.en.vtt")
 
 # How many seconds of the backup's cue timeline to actually replay when sampling its
 # health. Kept short so the pre-failover check stays fast, long enough to cross several

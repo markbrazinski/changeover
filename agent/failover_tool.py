@@ -52,10 +52,27 @@ def write_state(state: dict):
         json.dump(state, f, indent=2)
 
 
+# Channel-scoped backups (generalization phase). When CHANGEOVER_CHANNEL is set, every
+# backup path and telemetry job resolves through the channel registry, so each channel
+# verifies ITS OWN distinct backup file -- cut from a different film than that channel's
+# own primary. Unset falls back to the pre-generalization single-channel wiring so the
+# proven path is unchanged.
+#
+# NOTE: the legacy fallback paths below point at fixtures/source.mp4, which was REMOVED
+# (it was committed under a false film attribution). The fallback therefore fails closed
+# -- verify_backup_feed_healthy() returns False when the file is absent, which is the
+# correct behaviour: an unregistered/missing backup must never be assumed healthy.
+CHANNEL = os.environ.get("CHANGEOVER_CHANNEL")
+_registry = None
+if CHANNEL:
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "config"))
+    import channels as _registry
+
+_LEGACY_BACKUP = os.path.join(os.path.dirname(__file__), "..", "fixtures", "source.mp4")
+
 BACKUP_FEEDS = {
-    "sign_language": os.path.join(os.path.dirname(__file__), "..", "fixtures", "source.mp4"),
-    # Ring-1 captions addition: the backup program feed the captions layer fails over to.
-    "captions": os.path.join(os.path.dirname(__file__), "..", "fixtures", "source.mp4"),
+    "sign_language": _registry.backup_path(CHANNEL) if _registry else _LEGACY_BACKUP,
+    "captions": _registry.backup_path(CHANNEL) if _registry else _LEGACY_BACKUP,
 }
 
 
@@ -64,8 +81,10 @@ BACKUP_FEEDS = {
 # backup-telemetry check available and are refused (fail closed), same as an unregistered
 # backup file.
 BACKUP_TELEMETRY_JOBS = {
-    "sign_language": "backup_sign_language",
-    "captions": "backup_captions",
+    "sign_language": (_registry.backup_job_name(CHANNEL, "sign_language")
+                      if _registry else "backup_sign_language"),
+    "captions": (_registry.backup_job_name(CHANNEL, "captions")
+                 if _registry else "backup_captions"),
 }
 
 # Per-layer backup-health spec. Each layer's backup is judged on ITS OWN real metric with

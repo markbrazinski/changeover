@@ -43,9 +43,20 @@ import time
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VTT_PATH = os.path.join(ROOT, "fixtures", "captions", "placeholder.en.vtt")
 PUSHGATEWAY = "http://localhost:9091"
-JOB = "media_pipeline_captions"
+
+# Channel selection. CHANGEOVER_CHANNEL names a registered channel (config/channels.py),
+# which resolves this producer's real film, sidecar and Prometheus job. Unset falls back to
+# the single-channel placeholder so pre-generalization commands keep working unchanged.
+CHANNEL = os.environ.get("CHANGEOVER_CHANNEL")
+if CHANNEL:
+    sys.path.insert(0, os.path.join(ROOT, "config"))
+    import channels as _ch
+    VTT_PATH = _ch.vtt_path(CHANNEL)
+    JOB = _ch.job_name(CHANNEL, "captions")
+else:
+    VTT_PATH = os.path.join(ROOT, "fixtures", "captions", "placeholder.en.vtt")
+    JOB = "media_pipeline_captions"
 
 CUE_TIME_RE = re.compile(
     r"(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})\.(\d{3})"
