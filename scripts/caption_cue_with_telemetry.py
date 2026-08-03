@@ -5,7 +5,7 @@ WHAT IS ACTUALLY MEASURED
 -------------------------
 Two threads with independent clocks:
 
-  * The CUE PUBLISHER walks fixtures/captions/tears_of_steel.en.vtt in real time. When
+  * The CUE PUBLISHER walks fixtures/captions/placeholder.en.vtt in real time. When
     wall-clock program time reaches a cue's start timestamp, it "publishes" that cue and
     records (a) the cue's own media timestamp and (b) the wall-clock instant it went out.
   * The SAMPLER polls on its own fixed interval, decoupled from cue arrival, and computes
@@ -43,7 +43,7 @@ import time
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VTT_PATH = os.path.join(ROOT, "fixtures", "captions", "tears_of_steel.en.vtt")
+VTT_PATH = os.path.join(ROOT, "fixtures", "captions", "placeholder.en.vtt")
 PUSHGATEWAY = "http://localhost:9091"
 JOB = "media_pipeline_captions"
 

@@ -163,7 +163,7 @@ offset = program_clock_now - media_timestamp_of_last_published_cue
 ```
 
 A cue-publisher thread walks the real WebVTT sidecar
-(`fixtures/captions/tears_of_steel.en.vtt`) against a real program clock; an independent
+(`fixtures/captions/placeholder.en.vtt`) against a real program clock; an independent
 sampler thread polls the offset on its own interval. When the fault stops the publisher,
 `last_cue` freezes while the program clock keeps advancing, so the offset climbs for real.
 Nothing is injected — the climb is arithmetic on two clocks, one of which stopped.
@@ -173,10 +173,38 @@ Nothing is injected — the climb is arithmetic on two clocks, one of which stop
 `|wall_elapsed - ffmpeg_video_PTS|` — an *encoder-drift* measurement that never touches a
 caption. The two metrics are deliberately kept separate and must not be conflated.
 
-**On the caption sidecar:** the cue *timing* is real and frame-aligned to the actual media,
-but the caption *text* is authored in-project for this demo. It is not a Blender-origin
-subtitle file and does not claim to be. The video is Tears of Steel (© Blender Foundation,
-CC BY 3.0).
+> **No film is attached to this pipeline yet.**
+>
+> An earlier version of this README stated the program feed was Tears of Steel
+> (© Blender Foundation, CC BY 3.0). **That attribution was wrong.** The file it described
+> (`fixtures/source.mp4`) was 1920×1080 / 179.2 s; Tears of Steel is natively 1920×800 /
+> ~12:14, and inspection confirmed the file was not a film at all. No open-license film has
+> been part of this pipeline at any point. That file and its re-encodes have been removed.
+>
+> This does **not** affect any measured result — see "Why the metrics survive a film swap"
+> below. Real films are being supplied; the drop-in spec is in
+> "Adding a film (drop-in spec)".
+
+**On the caption sidecar:** `fixtures/captions/placeholder.en.vtt` is a working placeholder.
+Its cue *text* is authored in-project (not a transcript of anything); its cue *timing* is a
+real monotonic 2.002 s-cadence timeline. The timings are film-independent — wall-clock
+offsets from program start, not frame boundaries of any particular video.
+
+## Why the metrics survive a film swap
+
+Both instrumented metrics are **pure clock arithmetic. Neither decodes, samples, or
+inspects a single pixel.**
+
+| Metric | Computed as | Reads pixels? |
+|---|---|---|
+| `caption_cue_sync_offset_seconds` | `time.time() − program_start` minus the media timestamp of the last published cue — both scalars ([caption_cue_with_telemetry.py:97-106](scripts/caption_cue_with_telemetry.py#L97-L106)) | No |
+| `feed_liveness_seconds` | `time.time() − last_frame_arrival_time`, where arrivals are counted from ffmpeg's `-progress` `out_time_ms=` **text** stream ([feed_liveness_with_telemetry.py:88-100](scripts/feed_liveness_with_telemetry.py#L88-L100)) | No |
+
+No image library is imported anywhere in `scripts/` or `agent/` — no OpenCV, PIL, numpy,
+imread, histogram, SSIM/PSNR, or scene detection. The only `ffprobe` calls read
+`format=duration`; the only `ffmpeg` calls transcode with `-progress` and never read frame
+content. Swapping the underlying video changes what a viewer would *see* and nothing a
+metric *measures*.
 
 ## Full acceptance run (one command)
 

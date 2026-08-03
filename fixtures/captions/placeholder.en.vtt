@@ -1,15 +1,26 @@
 WEBVTT
 
 NOTE
-Authored in-project for the Changeover demo rig. This is NOT a Blender-origin
-subtitle file and does not claim to be: the on-screen caption TEXT is authored
-test content written for this project. What IS real is the cue TIMING -- each
-cue start/end is placed on a real frame boundary of fixtures/source.mp4
-(29.97 fps / 30000:1001, 179.212s, 5371 frames), so a producer diffing cue
-timestamps against an advancing program clock is measuring a real quantity.
+PLACEHOLDER SIDECAR -- no film is attached to this pipeline yet.
 
-The video is Tears of Steel (c) Blender Foundation, CC BY 3.0, used as the
-open-license program feed. The caption text below is ours.
+Authored in-project for the Changeover demo rig. The caption TEXT below is
+authored test content written for this project; it is not a transcript of
+anything. The cue TIMING is a real, monotonic 2.002s-cadence timeline that a
+producer can diff against an advancing program clock.
+
+PROVENANCE CORRECTION: an earlier version of this file was named
+tears_of_steel.en.vtt and stated the program feed was Tears of Steel
+(c) Blender Foundation, CC BY 3.0. That attribution was WRONG. The file it
+described (fixtures/source.mp4) was 1920x1080 / 179.2s, whereas Tears of Steel
+is natively 1920x800 / ~12:14, and inspection showed it was not a film at all.
+No open-license film has been part of this pipeline at any point. That source
+file has been removed; this sidecar is retained as a working placeholder until
+real films are supplied.
+
+The cue timings here are film-independent: they are wall-clock offsets from
+program start, not frame boundaries of any particular video. When a real film is
+attached, either these timings work as-is against it or a per-film sidecar is
+authored to the spec in README.md.
 
 Cue cadence is deliberately ~2s with ~0.5s gaps so that a stalled cue producer
 is measurable against the program clock within a few seconds.

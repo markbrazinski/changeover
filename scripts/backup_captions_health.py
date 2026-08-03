@@ -27,7 +27,7 @@ PUSHGATEWAY = "http://localhost:9091"
 JOB = "backup_captions"
 
 BACKUP_VIDEO = os.path.join(ROOT, "fixtures", "source.mp4")
-BACKUP_VTT = os.path.join(ROOT, "fixtures", "captions", "tears_of_steel.en.vtt")
+BACKUP_VTT = os.path.join(ROOT, "fixtures", "captions", "placeholder.en.vtt")
 
 # How many seconds of the backup's cue timeline to actually replay when sampling its
 # health. Kept short so the pre-failover check stays fast, long enough to cross several
