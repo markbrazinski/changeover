@@ -1,0 +1,898 @@
+WEBVTT
+
+NOTE
+Caption sidecar for the "tears_of_steel" channel of the Changeover demo rig.
+
+Film: Tears of Steel (2012), Blender Foundation
+License: CC BY 3.0 -- embedded in the file's own metadata
+(comment tag: license:http://creativecommons.org/licenses/by/3.0/).
+Source: http://archive.org/details/Tears-of-Steel
+
+THE CUE TEXT BELOW IS AUTHORED PLACEHOLDER CONTENT, NOT A TRANSCRIPT. This film
+ships without an embedded subtitle stream, and inventing dialogue would fabricate
+the film's content. The lines describe the monitoring rig itself so they can never
+be mistaken for the film's script.
+
+What IS real: the cue TIMING. 292 cues at a 2.002s cadence with
+0.5s gaps, spanning this film's actual ffprobe-measured duration of
+734.121s. Cue timing is the only thing the caption metric reads -- the offset
+is program-clock-now minus the media timestamp of the last published cue.
+
+Cadence is deliberately ~2s so a stalled cue publisher becomes measurable against
+the program clock within a few seconds.
+
+00:00:02.002 --> 00:00:04.004
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:00:04.504 --> 00:00:06.506
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:00:07.006 --> 00:00:09.008
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:00:09.508 --> 00:00:11.510
+<v Narrator>All monitored layers holding steady.
+
+00:00:12.010 --> 00:00:14.012
+<v Narrator>Program clock advancing normally.
+
+00:00:14.512 --> 00:00:16.514
+<v Narrator>Caption cue cadence nominal.
+
+00:00:17.014 --> 00:00:19.016
+<v Narrator>No drift detected across monitored layers.
+
+00:00:19.516 --> 00:00:21.518
+<v Narrator>Encoder output stable.
+
+00:00:22.018 --> 00:00:24.020
+<v Narrator>Caption timing continues to track the program clock.
+
+00:00:24.520 --> 00:00:26.522
+<v Narrator>Layer health checks passing.
+
+00:00:27.022 --> 00:00:29.024
+<v Narrator>Monitoring window continuing.
+
+00:00:29.524 --> 00:00:31.526
+<v Narrator>Caption sync holding at baseline.
+
+00:00:32.026 --> 00:00:34.028
+<v Narrator>Cue delivery on schedule.
+
+00:00:34.528 --> 00:00:36.530
+<v Narrator>Downstream distribution nominal.
+
+00:00:37.030 --> 00:00:39.032
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:00:39.532 --> 00:00:41.534
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:00:42.034 --> 00:00:44.036
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:00:44.536 --> 00:00:46.538
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:00:47.038 --> 00:00:49.040
+<v Narrator>All monitored layers holding steady.
+
+00:00:49.540 --> 00:00:51.542
+<v Narrator>Program clock advancing normally.
+
+00:00:52.042 --> 00:00:54.044
+<v Narrator>Caption cue cadence nominal.
+
+00:00:54.544 --> 00:00:56.546
+<v Narrator>No drift detected across monitored layers.
+
+00:00:57.046 --> 00:00:59.048
+<v Narrator>Encoder output stable.
+
+00:00:59.548 --> 00:01:01.550
+<v Narrator>Caption timing continues to track the program clock.
+
+00:01:02.050 --> 00:01:04.052
+<v Narrator>Layer health checks passing.
+
+00:01:04.552 --> 00:01:06.554
+<v Narrator>Monitoring window continuing.
+
+00:01:07.054 --> 00:01:09.056
+<v Narrator>Caption sync holding at baseline.
+
+00:01:09.556 --> 00:01:11.558
+<v Narrator>Cue delivery on schedule.
+
+00:01:12.058 --> 00:01:14.060
+<v Narrator>Downstream distribution nominal.
+
+00:01:14.560 --> 00:01:16.562
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:01:17.062 --> 00:01:19.064
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:01:19.564 --> 00:01:21.566
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:01:22.066 --> 00:01:24.068
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:01:24.568 --> 00:01:26.570
+<v Narrator>All monitored layers holding steady.
+
+00:01:27.070 --> 00:01:29.072
+<v Narrator>Program clock advancing normally.
+
+00:01:29.572 --> 00:01:31.574
+<v Narrator>Caption cue cadence nominal.
+
+00:01:32.074 --> 00:01:34.076
+<v Narrator>No drift detected across monitored layers.
+
+00:01:34.576 --> 00:01:36.578
+<v Narrator>Encoder output stable.
+
+00:01:37.078 --> 00:01:39.080
+<v Narrator>Caption timing continues to track the program clock.
+
+00:01:39.580 --> 00:01:41.582
+<v Narrator>Layer health checks passing.
+
+00:01:42.082 --> 00:01:44.084
+<v Narrator>Monitoring window continuing.
+
+00:01:44.584 --> 00:01:46.586
+<v Narrator>Caption sync holding at baseline.
+
+00:01:47.086 --> 00:01:49.088
+<v Narrator>Cue delivery on schedule.
+
+00:01:49.588 --> 00:01:51.590
+<v Narrator>Downstream distribution nominal.
+
+00:01:52.090 --> 00:01:54.092
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:01:54.592 --> 00:01:56.594
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:01:57.094 --> 00:01:59.096
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:01:59.596 --> 00:02:01.598
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:02:02.098 --> 00:02:04.100
+<v Narrator>All monitored layers holding steady.
+
+00:02:04.600 --> 00:02:06.602
+<v Narrator>Program clock advancing normally.
+
+00:02:07.102 --> 00:02:09.104
+<v Narrator>Caption cue cadence nominal.
+
+00:02:09.604 --> 00:02:11.606
+<v Narrator>No drift detected across monitored layers.
+
+00:02:12.106 --> 00:02:14.108
+<v Narrator>Encoder output stable.
+
+00:02:14.608 --> 00:02:16.610
+<v Narrator>Caption timing continues to track the program clock.
+
+00:02:17.110 --> 00:02:19.112
+<v Narrator>Layer health checks passing.
+
+00:02:19.612 --> 00:02:21.614
+<v Narrator>Monitoring window continuing.
+
+00:02:22.114 --> 00:02:24.116
+<v Narrator>Caption sync holding at baseline.
+
+00:02:24.616 --> 00:02:26.618
+<v Narrator>Cue delivery on schedule.
+
+00:02:27.118 --> 00:02:29.120
+<v Narrator>Downstream distribution nominal.
+
+00:02:29.620 --> 00:02:31.622
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:02:32.122 --> 00:02:34.124
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:02:34.624 --> 00:02:36.626
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:02:37.126 --> 00:02:39.128
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:02:39.628 --> 00:02:41.630
+<v Narrator>All monitored layers holding steady.
+
+00:02:42.130 --> 00:02:44.132
+<v Narrator>Program clock advancing normally.
+
+00:02:44.632 --> 00:02:46.634
+<v Narrator>Caption cue cadence nominal.
+
+00:02:47.134 --> 00:02:49.136
+<v Narrator>No drift detected across monitored layers.
+
+00:02:49.636 --> 00:02:51.638
+<v Narrator>Encoder output stable.
+
+00:02:52.138 --> 00:02:54.140
+<v Narrator>Caption timing continues to track the program clock.
+
+00:02:54.640 --> 00:02:56.642
+<v Narrator>Layer health checks passing.
+
+00:02:57.142 --> 00:02:59.144
+<v Narrator>Monitoring window continuing.
+
+00:02:59.644 --> 00:03:01.646
+<v Narrator>Caption sync holding at baseline.
+
+00:03:02.146 --> 00:03:04.148
+<v Narrator>Cue delivery on schedule.
+
+00:03:04.648 --> 00:03:06.650
+<v Narrator>Downstream distribution nominal.
+
+00:03:07.150 --> 00:03:09.152
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:03:09.652 --> 00:03:11.654
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:03:12.154 --> 00:03:14.156
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:03:14.656 --> 00:03:16.658
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:03:17.158 --> 00:03:19.160
+<v Narrator>All monitored layers holding steady.
+
+00:03:19.660 --> 00:03:21.662
+<v Narrator>Program clock advancing normally.
+
+00:03:22.162 --> 00:03:24.164
+<v Narrator>Caption cue cadence nominal.
+
+00:03:24.664 --> 00:03:26.666
+<v Narrator>No drift detected across monitored layers.
+
+00:03:27.166 --> 00:03:29.168
+<v Narrator>Encoder output stable.
+
+00:03:29.668 --> 00:03:31.670
+<v Narrator>Caption timing continues to track the program clock.
+
+00:03:32.170 --> 00:03:34.172
+<v Narrator>Layer health checks passing.
+
+00:03:34.672 --> 00:03:36.674
+<v Narrator>Monitoring window continuing.
+
+00:03:37.174 --> 00:03:39.176
+<v Narrator>Caption sync holding at baseline.
+
+00:03:39.676 --> 00:03:41.678
+<v Narrator>Cue delivery on schedule.
+
+00:03:42.178 --> 00:03:44.180
+<v Narrator>Downstream distribution nominal.
+
+00:03:44.680 --> 00:03:46.682
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:03:47.182 --> 00:03:49.184
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:03:49.684 --> 00:03:51.686
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:03:52.186 --> 00:03:54.188
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:03:54.688 --> 00:03:56.690
+<v Narrator>All monitored layers holding steady.
+
+00:03:57.190 --> 00:03:59.192
+<v Narrator>Program clock advancing normally.
+
+00:03:59.692 --> 00:04:01.694
+<v Narrator>Caption cue cadence nominal.
+
+00:04:02.194 --> 00:04:04.196
+<v Narrator>No drift detected across monitored layers.
+
+00:04:04.696 --> 00:04:06.698
+<v Narrator>Encoder output stable.
+
+00:04:07.198 --> 00:04:09.200
+<v Narrator>Caption timing continues to track the program clock.
+
+00:04:09.700 --> 00:04:11.702
+<v Narrator>Layer health checks passing.
+
+00:04:12.202 --> 00:04:14.204
+<v Narrator>Monitoring window continuing.
+
+00:04:14.704 --> 00:04:16.706
+<v Narrator>Caption sync holding at baseline.
+
+00:04:17.206 --> 00:04:19.208
+<v Narrator>Cue delivery on schedule.
+
+00:04:19.708 --> 00:04:21.710
+<v Narrator>Downstream distribution nominal.
+
+00:04:22.210 --> 00:04:24.212
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:04:24.712 --> 00:04:26.714
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:04:27.214 --> 00:04:29.216
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:04:29.716 --> 00:04:31.718
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:04:32.218 --> 00:04:34.220
+<v Narrator>All monitored layers holding steady.
+
+00:04:34.720 --> 00:04:36.722
+<v Narrator>Program clock advancing normally.
+
+00:04:37.222 --> 00:04:39.224
+<v Narrator>Caption cue cadence nominal.
+
+00:04:39.724 --> 00:04:41.726
+<v Narrator>No drift detected across monitored layers.
+
+00:04:42.226 --> 00:04:44.228
+<v Narrator>Encoder output stable.
+
+00:04:44.728 --> 00:04:46.730
+<v Narrator>Caption timing continues to track the program clock.
+
+00:04:47.230 --> 00:04:49.232
+<v Narrator>Layer health checks passing.
+
+00:04:49.732 --> 00:04:51.734
+<v Narrator>Monitoring window continuing.
+
+00:04:52.234 --> 00:04:54.236
+<v Narrator>Caption sync holding at baseline.
+
+00:04:54.736 --> 00:04:56.738
+<v Narrator>Cue delivery on schedule.
+
+00:04:57.238 --> 00:04:59.240
+<v Narrator>Downstream distribution nominal.
+
+00:04:59.740 --> 00:05:01.742
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:05:02.242 --> 00:05:04.244
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:05:04.744 --> 00:05:06.746
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:05:07.246 --> 00:05:09.248
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:05:09.748 --> 00:05:11.750
+<v Narrator>All monitored layers holding steady.
+
+00:05:12.250 --> 00:05:14.252
+<v Narrator>Program clock advancing normally.
+
+00:05:14.752 --> 00:05:16.754
+<v Narrator>Caption cue cadence nominal.
+
+00:05:17.254 --> 00:05:19.256
+<v Narrator>No drift detected across monitored layers.
+
+00:05:19.756 --> 00:05:21.758
+<v Narrator>Encoder output stable.
+
+00:05:22.258 --> 00:05:24.260
+<v Narrator>Caption timing continues to track the program clock.
+
+00:05:24.760 --> 00:05:26.762
+<v Narrator>Layer health checks passing.
+
+00:05:27.262 --> 00:05:29.264
+<v Narrator>Monitoring window continuing.
+
+00:05:29.764 --> 00:05:31.766
+<v Narrator>Caption sync holding at baseline.
+
+00:05:32.266 --> 00:05:34.268
+<v Narrator>Cue delivery on schedule.
+
+00:05:34.768 --> 00:05:36.770
+<v Narrator>Downstream distribution nominal.
+
+00:05:37.270 --> 00:05:39.272
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:05:39.772 --> 00:05:41.774
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:05:42.274 --> 00:05:44.276
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:05:44.776 --> 00:05:46.778
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:05:47.278 --> 00:05:49.280
+<v Narrator>All monitored layers holding steady.
+
+00:05:49.780 --> 00:05:51.782
+<v Narrator>Program clock advancing normally.
+
+00:05:52.282 --> 00:05:54.284
+<v Narrator>Caption cue cadence nominal.
+
+00:05:54.784 --> 00:05:56.786
+<v Narrator>No drift detected across monitored layers.
+
+00:05:57.286 --> 00:05:59.288
+<v Narrator>Encoder output stable.
+
+00:05:59.788 --> 00:06:01.790
+<v Narrator>Caption timing continues to track the program clock.
+
+00:06:02.290 --> 00:06:04.292
+<v Narrator>Layer health checks passing.
+
+00:06:04.792 --> 00:06:06.794
+<v Narrator>Monitoring window continuing.
+
+00:06:07.294 --> 00:06:09.296
+<v Narrator>Caption sync holding at baseline.
+
+00:06:09.796 --> 00:06:11.798
+<v Narrator>Cue delivery on schedule.
+
+00:06:12.298 --> 00:06:14.300
+<v Narrator>Downstream distribution nominal.
+
+00:06:14.800 --> 00:06:16.802
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:06:17.302 --> 00:06:19.304
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:06:19.804 --> 00:06:21.806
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:06:22.306 --> 00:06:24.308
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:06:24.808 --> 00:06:26.810
+<v Narrator>All monitored layers holding steady.
+
+00:06:27.310 --> 00:06:29.312
+<v Narrator>Program clock advancing normally.
+
+00:06:29.812 --> 00:06:31.814
+<v Narrator>Caption cue cadence nominal.
+
+00:06:32.314 --> 00:06:34.316
+<v Narrator>No drift detected across monitored layers.
+
+00:06:34.816 --> 00:06:36.818
+<v Narrator>Encoder output stable.
+
+00:06:37.318 --> 00:06:39.320
+<v Narrator>Caption timing continues to track the program clock.
+
+00:06:39.820 --> 00:06:41.822
+<v Narrator>Layer health checks passing.
+
+00:06:42.322 --> 00:06:44.324
+<v Narrator>Monitoring window continuing.
+
+00:06:44.824 --> 00:06:46.826
+<v Narrator>Caption sync holding at baseline.
+
+00:06:47.326 --> 00:06:49.328
+<v Narrator>Cue delivery on schedule.
+
+00:06:49.828 --> 00:06:51.830
+<v Narrator>Downstream distribution nominal.
+
+00:06:52.330 --> 00:06:54.332
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:06:54.832 --> 00:06:56.834
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:06:57.334 --> 00:06:59.336
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:06:59.836 --> 00:07:01.838
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:07:02.338 --> 00:07:04.340
+<v Narrator>All monitored layers holding steady.
+
+00:07:04.840 --> 00:07:06.842
+<v Narrator>Program clock advancing normally.
+
+00:07:07.342 --> 00:07:09.344
+<v Narrator>Caption cue cadence nominal.
+
+00:07:09.844 --> 00:07:11.846
+<v Narrator>No drift detected across monitored layers.
+
+00:07:12.346 --> 00:07:14.348
+<v Narrator>Encoder output stable.
+
+00:07:14.848 --> 00:07:16.850
+<v Narrator>Caption timing continues to track the program clock.
+
+00:07:17.350 --> 00:07:19.352
+<v Narrator>Layer health checks passing.
+
+00:07:19.852 --> 00:07:21.854
+<v Narrator>Monitoring window continuing.
+
+00:07:22.354 --> 00:07:24.356
+<v Narrator>Caption sync holding at baseline.
+
+00:07:24.856 --> 00:07:26.858
+<v Narrator>Cue delivery on schedule.
+
+00:07:27.358 --> 00:07:29.360
+<v Narrator>Downstream distribution nominal.
+
+00:07:29.860 --> 00:07:31.862
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:07:32.362 --> 00:07:34.364
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:07:34.864 --> 00:07:36.866
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:07:37.366 --> 00:07:39.368
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:07:39.868 --> 00:07:41.870
+<v Narrator>All monitored layers holding steady.
+
+00:07:42.370 --> 00:07:44.372
+<v Narrator>Program clock advancing normally.
+
+00:07:44.872 --> 00:07:46.874
+<v Narrator>Caption cue cadence nominal.
+
+00:07:47.374 --> 00:07:49.376
+<v Narrator>No drift detected across monitored layers.
+
+00:07:49.876 --> 00:07:51.878
+<v Narrator>Encoder output stable.
+
+00:07:52.378 --> 00:07:54.380
+<v Narrator>Caption timing continues to track the program clock.
+
+00:07:54.880 --> 00:07:56.882
+<v Narrator>Layer health checks passing.
+
+00:07:57.382 --> 00:07:59.384
+<v Narrator>Monitoring window continuing.
+
+00:07:59.884 --> 00:08:01.886
+<v Narrator>Caption sync holding at baseline.
+
+00:08:02.386 --> 00:08:04.388
+<v Narrator>Cue delivery on schedule.
+
+00:08:04.888 --> 00:08:06.890
+<v Narrator>Downstream distribution nominal.
+
+00:08:07.390 --> 00:08:09.392
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:08:09.892 --> 00:08:11.894
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:08:12.394 --> 00:08:14.396
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:08:14.896 --> 00:08:16.898
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:08:17.398 --> 00:08:19.400
+<v Narrator>All monitored layers holding steady.
+
+00:08:19.900 --> 00:08:21.902
+<v Narrator>Program clock advancing normally.
+
+00:08:22.402 --> 00:08:24.404
+<v Narrator>Caption cue cadence nominal.
+
+00:08:24.904 --> 00:08:26.906
+<v Narrator>No drift detected across monitored layers.
+
+00:08:27.406 --> 00:08:29.408
+<v Narrator>Encoder output stable.
+
+00:08:29.908 --> 00:08:31.910
+<v Narrator>Caption timing continues to track the program clock.
+
+00:08:32.410 --> 00:08:34.412
+<v Narrator>Layer health checks passing.
+
+00:08:34.912 --> 00:08:36.914
+<v Narrator>Monitoring window continuing.
+
+00:08:37.414 --> 00:08:39.416
+<v Narrator>Caption sync holding at baseline.
+
+00:08:39.916 --> 00:08:41.918
+<v Narrator>Cue delivery on schedule.
+
+00:08:42.418 --> 00:08:44.420
+<v Narrator>Downstream distribution nominal.
+
+00:08:44.920 --> 00:08:46.922
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:08:47.422 --> 00:08:49.424
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:08:49.924 --> 00:08:51.926
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:08:52.426 --> 00:08:54.428
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:08:54.928 --> 00:08:56.930
+<v Narrator>All monitored layers holding steady.
+
+00:08:57.430 --> 00:08:59.432
+<v Narrator>Program clock advancing normally.
+
+00:08:59.932 --> 00:09:01.934
+<v Narrator>Caption cue cadence nominal.
+
+00:09:02.434 --> 00:09:04.436
+<v Narrator>No drift detected across monitored layers.
+
+00:09:04.936 --> 00:09:06.938
+<v Narrator>Encoder output stable.
+
+00:09:07.438 --> 00:09:09.440
+<v Narrator>Caption timing continues to track the program clock.
+
+00:09:09.940 --> 00:09:11.942
+<v Narrator>Layer health checks passing.
+
+00:09:12.442 --> 00:09:14.444
+<v Narrator>Monitoring window continuing.
+
+00:09:14.944 --> 00:09:16.946
+<v Narrator>Caption sync holding at baseline.
+
+00:09:17.446 --> 00:09:19.448
+<v Narrator>Cue delivery on schedule.
+
+00:09:19.948 --> 00:09:21.950
+<v Narrator>Downstream distribution nominal.
+
+00:09:22.450 --> 00:09:24.452
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:09:24.952 --> 00:09:26.954
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:09:27.454 --> 00:09:29.456
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:09:29.956 --> 00:09:31.958
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:09:32.458 --> 00:09:34.460
+<v Narrator>All monitored layers holding steady.
+
+00:09:34.960 --> 00:09:36.962
+<v Narrator>Program clock advancing normally.
+
+00:09:37.462 --> 00:09:39.464
+<v Narrator>Caption cue cadence nominal.
+
+00:09:39.964 --> 00:09:41.966
+<v Narrator>No drift detected across monitored layers.
+
+00:09:42.466 --> 00:09:44.468
+<v Narrator>Encoder output stable.
+
+00:09:44.968 --> 00:09:46.970
+<v Narrator>Caption timing continues to track the program clock.
+
+00:09:47.470 --> 00:09:49.472
+<v Narrator>Layer health checks passing.
+
+00:09:49.972 --> 00:09:51.974
+<v Narrator>Monitoring window continuing.
+
+00:09:52.474 --> 00:09:54.476
+<v Narrator>Caption sync holding at baseline.
+
+00:09:54.976 --> 00:09:56.978
+<v Narrator>Cue delivery on schedule.
+
+00:09:57.478 --> 00:09:59.480
+<v Narrator>Downstream distribution nominal.
+
+00:09:59.980 --> 00:10:01.982
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:10:02.482 --> 00:10:04.484
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:10:04.984 --> 00:10:06.986
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:10:07.486 --> 00:10:09.488
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:10:09.988 --> 00:10:11.990
+<v Narrator>All monitored layers holding steady.
+
+00:10:12.490 --> 00:10:14.492
+<v Narrator>Program clock advancing normally.
+
+00:10:14.992 --> 00:10:16.994
+<v Narrator>Caption cue cadence nominal.
+
+00:10:17.494 --> 00:10:19.496
+<v Narrator>No drift detected across monitored layers.
+
+00:10:19.996 --> 00:10:21.998
+<v Narrator>Encoder output stable.
+
+00:10:22.498 --> 00:10:24.500
+<v Narrator>Caption timing continues to track the program clock.
+
+00:10:25.000 --> 00:10:27.002
+<v Narrator>Layer health checks passing.
+
+00:10:27.502 --> 00:10:29.504
+<v Narrator>Monitoring window continuing.
+
+00:10:30.004 --> 00:10:32.006
+<v Narrator>Caption sync holding at baseline.
+
+00:10:32.506 --> 00:10:34.508
+<v Narrator>Cue delivery on schedule.
+
+00:10:35.008 --> 00:10:37.010
+<v Narrator>Downstream distribution nominal.
+
+00:10:37.510 --> 00:10:39.512
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:10:40.012 --> 00:10:42.014
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:10:42.514 --> 00:10:44.516
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:10:45.016 --> 00:10:47.018
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:10:47.518 --> 00:10:49.520
+<v Narrator>All monitored layers holding steady.
+
+00:10:50.020 --> 00:10:52.022
+<v Narrator>Program clock advancing normally.
+
+00:10:52.522 --> 00:10:54.524
+<v Narrator>Caption cue cadence nominal.
+
+00:10:55.024 --> 00:10:57.026
+<v Narrator>No drift detected across monitored layers.
+
+00:10:57.526 --> 00:10:59.528
+<v Narrator>Encoder output stable.
+
+00:11:00.028 --> 00:11:02.030
+<v Narrator>Caption timing continues to track the program clock.
+
+00:11:02.530 --> 00:11:04.532
+<v Narrator>Layer health checks passing.
+
+00:11:05.032 --> 00:11:07.034
+<v Narrator>Monitoring window continuing.
+
+00:11:07.534 --> 00:11:09.536
+<v Narrator>Caption sync holding at baseline.
+
+00:11:10.036 --> 00:11:12.038
+<v Narrator>Cue delivery on schedule.
+
+00:11:12.538 --> 00:11:14.540
+<v Narrator>Downstream distribution nominal.
+
+00:11:15.040 --> 00:11:17.042
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:11:17.542 --> 00:11:19.544
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:11:20.044 --> 00:11:22.046
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:11:22.546 --> 00:11:24.548
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:11:25.048 --> 00:11:27.050
+<v Narrator>All monitored layers holding steady.
+
+00:11:27.550 --> 00:11:29.552
+<v Narrator>Program clock advancing normally.
+
+00:11:30.052 --> 00:11:32.054
+<v Narrator>Caption cue cadence nominal.
+
+00:11:32.554 --> 00:11:34.556
+<v Narrator>No drift detected across monitored layers.
+
+00:11:35.056 --> 00:11:37.058
+<v Narrator>Encoder output stable.
+
+00:11:37.558 --> 00:11:39.560
+<v Narrator>Caption timing continues to track the program clock.
+
+00:11:40.060 --> 00:11:42.062
+<v Narrator>Layer health checks passing.
+
+00:11:42.562 --> 00:11:44.564
+<v Narrator>Monitoring window continuing.
+
+00:11:45.064 --> 00:11:47.066
+<v Narrator>Caption sync holding at baseline.
+
+00:11:47.566 --> 00:11:49.568
+<v Narrator>Cue delivery on schedule.
+
+00:11:50.068 --> 00:11:52.070
+<v Narrator>Downstream distribution nominal.
+
+00:11:52.570 --> 00:11:54.572
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:11:55.072 --> 00:11:57.074
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:11:57.574 --> 00:11:59.576
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:12:00.076 --> 00:12:02.078
+<v Narrator>Feed-liveness monitor reporting frame delivery.
+
+00:12:02.578 --> 00:12:04.580
+<v Narrator>All monitored layers holding steady.
+
+00:12:05.080 --> 00:12:07.082
+<v Narrator>Program clock advancing normally.
+
+00:12:07.582 --> 00:12:09.584
+<v Narrator>Caption cue cadence nominal.
+
+00:12:10.084 --> 00:12:12.086
+<v Narrator>No drift detected across monitored layers.

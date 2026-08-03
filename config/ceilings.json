@@ -1,0 +1,85 @@
+{
+  "safety_factor": 1.5,
+  "channels": {
+    "tears_of_steel": {
+      "captions": {
+        "samples": [
+          0.5011,
+          0.501,
+          0.5019,
+          0.503,
+          0.5027,
+          0.5038,
+          0.5049,
+          0.5059
+        ],
+        "n": 8,
+        "observed_min": 0.501,
+        "observed_max": 0.5059,
+        "observed_median": 0.5028,
+        "safety_factor": 1.5,
+        "ceiling": 0.7589,
+        "rule": "ceiling = observed_max * safety_factor"
+      },
+      "sign_language": {
+        "samples": [
+          0.408,
+          0.3713,
+          0.3368,
+          0.2997,
+          0.2694,
+          0.2314,
+          0.193,
+          0.1603
+        ],
+        "n": 8,
+        "observed_min": 0.1603,
+        "observed_max": 0.408,
+        "observed_median": 0.2845,
+        "safety_factor": 1.5,
+        "ceiling": 0.6119,
+        "rule": "ceiling = observed_max * safety_factor"
+      }
+    },
+    "sintel": {
+      "captions": {
+        "samples": [
+          0.5012,
+          0.5023,
+          0.5034,
+          0.5002,
+          0.4998,
+          0.4977,
+          0.4988,
+          0.4998
+        ],
+        "n": 8,
+        "observed_min": 0.4977,
+        "observed_max": 0.5034,
+        "observed_median": 0.5,
+        "safety_factor": 1.5,
+        "ceiling": 0.755,
+        "rule": "ceiling = observed_max * safety_factor"
+      },
+      "sign_language": {
+        "samples": [
+          0.3974,
+          0.3624,
+          0.3325,
+          0.2911,
+          0.2495,
+          0.2115,
+          0.1831,
+          0.139
+        ],
+        "n": 8,
+        "observed_min": 0.139,
+        "observed_max": 0.3974,
+        "observed_median": 0.2703,
+        "safety_factor": 1.5,
+        "ceiling": 0.5961,
+        "rule": "ceiling = observed_max * safety_factor"
+      }
+    }
+  }
+}
