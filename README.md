@@ -72,6 +72,20 @@ grafana_toolset = MCPToolset(
     ...
 ```
 
+### Assembled agent call sites (verified automatically)
+
+`python scripts/verify_sponsor_runtime.py` checks both sponsors are imported, called in
+code, AND exercised at runtime — and fails non-zero otherwise. Current verified sites in
+[agent/assembled_agent.py](agent/assembled_agent.py):
+
+| Sponsor | Import | Runtime call |
+|---|---|---|
+| Google Cloud (Gemini via ADK) | `google.adk.agents.Agent` :36, `google.adk.runners.InMemoryRunner` :37, `google.genai.types` :40 | `model="gemini-2.5-flash"` :306, `runner.run_async(` :318 |
+| Grafana (official `mcp-grafana`) | `MCPToolset` :38, `StreamableHTTPConnectionParams` :39 | `MCPToolset(` :300, `StreamableHTTPConnectionParams(` :301 |
+
+Runtime proof is artifact-based, not asserted: real MCP calls with measured latencies in
+`logs/traces/`, and a real Gemini reply in `logs/assembled_*.json`.
+
 The same pattern repeats across `agent/gate1_reasoning_only.py` through
 `agent/gate5_diagnose_and_failover.py`, `agent/evidence_gate.py`, and
 `agent/failover_tool.py`. This is the alternative deployment path the Grafana MCP docs
@@ -163,6 +177,75 @@ caption. The two metrics are deliberately kept separate and must not be conflate
 but the caption *text* is authored in-project for this demo. It is not a Blender-origin
 subtitle file and does not claim to be. The video is Tears of Steel (© Blender Foundation,
 CC BY 3.0).
+
+## Full acceptance run (one command)
+
+```bash
+./scripts/run_acceptance.sh
+```
+
+Runs every demo beat against the real rig and writes a machine-readable pass/fail table
+with the real measured numbers to `logs/acceptance_table.json`.
+
+| Beat | Result | Real measured evidence |
+|---|---|---|
+| Won't guess (MCP unreachable) | PASS | `gate.tier=unavailable`, no layer named |
+| Happy path + verify-by-measurement | PASS | fault 75.65 s → restored **0.5311 s** ≤ 1.5 s ceiling, confirmed over real post-swap reads |
+| Captions-vs-sign discrimination | PASS | sign fault → `sign_language` @ **175.75 s**; captions fault → `captions` @ **75.65 s** |
+| Won't switch (unconfirmed backup) | PASS | human approved, failover attempted, refused on backup health |
+| Fixture-contamination fix | PASS | 6/6 regression tests |
+| Sponsor runtime evidence | PASS | static call sites + runtime artifacts |
+
+Individual pieces:
+
+```bash
+python tests/test_series_scope_guard.py        # fixture-contamination regression suite
+python scripts/verify_sponsor_runtime.py       # both sponsors: imported, called, exercised
+python agent/assembled_agent.py --scenario demo --approve --verify
+```
+
+## The two instrumented layers
+
+Exactly two layers are instrumented. **Audio description is not instrumented** — there is
+no AD metric and the agent is told to say it cannot assess AD rather than infer anything.
+
+| Layer | Metric | Physical quantity | Healthy | Faulted (measured) |
+|---|---|---|---|---|
+| `captions` | `caption_cue_sync_offset_seconds` | program clock − last published cue's media timestamp | ~0.50–0.60 s | climbs unbounded (observed 125.9 s) |
+| `sign_language` | `feed_liveness_seconds` | seconds since the feed process last produced a frame | ~0.27–0.30 s | climbs unbounded (observed 270.9 s) |
+
+> **`feed_liveness_seconds` measures feed liveness on a STAND-IN feed — it is not a
+> sign-language-content measurement.** This repository contains no sign-language content;
+> the monitored feed is a second process carrying the same program video. The
+> `layer="sign_language"` label denotes which layer slot the stand-in occupies. An earlier
+> metric named `sign_feed_freshness_seconds` implied more than it measured and was renamed
+> for this reason. See [scripts/feed_liveness_with_telemetry.py](scripts/feed_liveness_with_telemetry.py).
+
+Two different physical quantities on two layers is what the discrimination beat proves —
+not two fully independent accessibility layers.
+
+## Query scoping (the fixture-contamination fix)
+
+Diagnosis queries **must pin both `job` and `mode`**. Several producers publish
+similarly-named metrics, and an under-scoped query matches sibling series:
+
+```promql
+# WRONG -- a real 8.10 s fault read as 0.0107 s this way
+sign_feed_freshness_seconds{layer="sign_language"}
+
+# CORRECT
+caption_cue_sync_offset_seconds{job="media_pipeline_captions",mode="frozen_captions"}
+```
+
+[agent/series_scope_guard.py](agent/series_scope_guard.py) enforces this at runtime and
+refuses ambiguous queries; [tests/test_series_scope_guard.py](tests/test_series_scope_guard.py)
+locks the behavior in, including no-over-refusal controls.
+
+## UI contract
+
+[docs/UI_CONTRACT.md](docs/UI_CONTRACT.md) documents the two surfaces the front end binds
+to: the metric series (queryable via the Grafana MCP) and the structured tool-call trace
+(`logs/traces/trace_<scenario>.json`), including a real query-miss-then-retry event.
 
 ## Run the real fault-injection pipelines
 

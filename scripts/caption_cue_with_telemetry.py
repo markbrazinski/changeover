@@ -198,6 +198,86 @@ def run(mode: str, sample_count: int, interval_s: float, stall_after: int = None
     return observed
 
 
+def hold_healthy(seconds: float, interval_s: float = 5.0):
+    """Keeps a HEALTHY captions exporter alive and publishing for `seconds`.
+
+    Needed for the discrimination scenario: to show the agent correctly naming the faulted
+    layer and ruling out the healthy one, the healthy layer's exporter must actually be
+    ALIVE. A finite baseline run that has exited is a dead exporter, and the evidence gate
+    refuses on it (correctly) before any diagnosis happens -- which tests the gate, not
+    discrimination.
+
+    The cue publisher keeps running, so the offset stays at its real healthy value and is
+    measured the same way as everywhere else -- nothing is asserted or held constant.
+    """
+    cues = parse_vtt_cues(VTT_PATH)
+    program_start = time.time()
+    tracker = CueTracker(program_start)
+    stop_event = threading.Event()
+
+    pub = threading.Thread(target=cue_publisher, args=(cues, tracker, stop_event), daemon=True)
+    pub.start()
+
+    print(f"  holding HEALTHY captions exporter open for {seconds:.0f}s")
+    idx = 0
+    deadline = time.time() + seconds
+    while time.time() < deadline:
+        time.sleep(interval_s)
+        offset, last_cue_ts, program_now = tracker.offset()
+        # The sidecar is finite; once its cues are exhausted the publisher exits and the
+        # offset would climb like a fault. Restart the program clock to loop the sidecar,
+        # keeping the feed genuinely healthy for the whole window.
+        if not pub.is_alive():
+            program_start = time.time()
+            tracker = CueTracker(program_start)
+            stop_event = threading.Event()
+            pub = threading.Thread(target=cue_publisher, args=(cues, tracker, stop_event), daemon=True)
+            pub.start()
+            continue
+        push_sample(offset, "baseline", idx, 0, last_cue_ts, program_now)
+        idx += 1
+
+    stop_event.set()
+    pub.join(timeout=3)
+
+
+def recover(seconds: float, interval_s: float = 5.0):
+    """Post-failover recovery: the layer is now being served by the healthy BACKUP feed, so
+    its measured cue offset genuinely returns to baseline.
+
+    Pushes to the SAME series the fault was pushed under (mode="frozen_captions"), because
+    that is the series the post-swap verifier reads -- the metric recovering IS the physical
+    fact that the backup feed is delivering cues on time. The offset is measured exactly as
+    everywhere else (program clock minus last published cue); nothing is asserted or pinned
+    to a healthy-looking constant.
+    """
+    cues = parse_vtt_cues(VTT_PATH)
+    program_start = time.time()
+    tracker = CueTracker(program_start)
+    stop_event = threading.Event()
+    pub = threading.Thread(target=cue_publisher, args=(cues, tracker, stop_event), daemon=True)
+    pub.start()
+
+    print(f"  RECOVERED: backup feed publishing cues for {seconds:.0f}s")
+    idx = 0
+    deadline = time.time() + seconds
+    while time.time() < deadline:
+        time.sleep(interval_s)
+        if not pub.is_alive():  # sidecar exhausted -- loop it to keep the feed healthy
+            program_start = time.time()
+            tracker = CueTracker(program_start)
+            stop_event = threading.Event()
+            pub = threading.Thread(target=cue_publisher, args=(cues, tracker, stop_event), daemon=True)
+            pub.start()
+            continue
+        offset, last_cue_ts, program_now = tracker.offset()
+        push_sample(offset, "frozen_captions", idx, 0, last_cue_ts, program_now)
+        idx += 1
+
+    stop_event.set()
+    pub.join(timeout=3)
+
+
 def baseline():
     print("=== BASELINE: cue publisher runs normally against the real program clock ===")
     # Same 5s sampling as the fault mode so both series are stored at the same real
@@ -269,6 +349,12 @@ if __name__ == "__main__":
     elif mode == "hold_open":
         seconds = float(sys.argv[2]) if len(sys.argv) > 2 else 180.0
         hold_open("frozen_captions", seconds)
+    elif mode == "hold_healthy":
+        seconds = float(sys.argv[2]) if len(sys.argv) > 2 else 180.0
+        hold_healthy(seconds)
+    elif mode == "recover":
+        seconds = float(sys.argv[2]) if len(sys.argv) > 2 else 180.0
+        recover(seconds)
     else:
         print("usage: python caption_cue_with_telemetry.py "
               "<baseline|frozen_captions|hold_open [seconds]>")
