@@ -30,6 +30,15 @@ DATASOURCE_UID = "grafanacloud-prom"
 # shape as the primary-feed fault detection, applied to the backup instead.
 BACKUP_FRESHNESS_FAULT_THRESHOLD_SECONDS = 3.0
 
+# Captions Ring-1 addition. The captions backup's own health is measured as a cue-vs-
+# program-clock offset (scripts/backup_captions_health.py), which is a DIFFERENT physical
+# quantity from the sign backup's freshness -- so it gets its own threshold rather than
+# reusing the freshness number. A healthy backup's offset is bounded by its cue cadence
+# (~2s cues => worst-case offset just over 2s); a stalled backup cue publisher climbs
+# without bound. 4.0s sits above the real measured healthy ceiling (~2.5s) and far below
+# a genuine stall.
+BACKUP_CAPTION_OFFSET_FAULT_THRESHOLD_SECONDS = 4.0
+
 
 def read_state() -> dict:
     if not os.path.exists(STATE_PATH):
@@ -45,6 +54,8 @@ def write_state(state: dict):
 
 BACKUP_FEEDS = {
     "sign_language": os.path.join(os.path.dirname(__file__), "..", "fixtures", "source.mp4"),
+    # Ring-1 captions addition: the backup program feed the captions layer fails over to.
+    "captions": os.path.join(os.path.dirname(__file__), "..", "fixtures", "source.mp4"),
 }
 
 
@@ -54,10 +65,27 @@ BACKUP_FEEDS = {
 # backup file.
 BACKUP_TELEMETRY_JOBS = {
     "sign_language": "backup_sign_language",
+    "captions": "backup_captions",
+}
+
+# Per-layer backup-health spec. Each layer's backup is judged on ITS OWN real metric with
+# its own threshold -- captions health is a cue-vs-program-clock offset, sign health is a
+# frame freshness value, and conflating them would mean judging one layer by the other's
+# physics. The sign_language entry reproduces exactly the expression and threshold that
+# were already proven (10/10, Task 3); it is transcribed here, not changed.
+BACKUP_HEALTH_SPEC = {
+    "sign_language": {
+        "expr": 'backup_sign_language_freshness_seconds{{job="{job}"}}',
+        "threshold": BACKUP_FRESHNESS_FAULT_THRESHOLD_SECONDS,
+    },
+    "captions": {
+        "expr": 'backup_captions_cue_offset_seconds{{job="{job}"}}',
+        "threshold": BACKUP_CAPTION_OFFSET_FAULT_THRESHOLD_SECONDS,
+    },
 }
 
 
-def _check_backup_telemetry(job: str) -> tuple:
+def _check_backup_telemetry(job: str, expr_template: str = None) -> tuple:
     """Runs the real evidence gate PLUS a real value fetch against the backup's own
     telemetry, in an isolated thread with its own event loop -- verify_backup_feed_healthy()
     is called synchronously from inside an already-running ADK event loop (via
@@ -65,10 +93,14 @@ def _check_backup_telemetry(job: str) -> tuple:
     running event loop." A dedicated thread sidesteps that safely without needing
     failover_tool's whole call chain to become async.
 
-    Returns (ok, freshness_value_or_None, detail)."""
+    Returns (ok, value_or_None, detail). expr_template defaults to the sign_language
+    expression so any existing caller that passes only a job name behaves exactly as
+    before this was parameterized."""
     from evidence_gate import check_evidence, _get_query_tool, _run_query
 
-    expr = f'backup_sign_language_freshness_seconds{{job="{job}"}}'
+    if expr_template is None:
+        expr_template = BACKUP_HEALTH_SPEC["sign_language"]["expr"]
+    expr = expr_template.format(job=job)
     result_holder = {}
 
     def runner():
@@ -131,13 +163,14 @@ def verify_backup_feed_healthy(layer: str) -> bool:
         return False
 
     telemetry_job = BACKUP_TELEMETRY_JOBS.get(layer)
-    if not telemetry_job:
+    spec = BACKUP_HEALTH_SPEC.get(layer)
+    if not telemetry_job or not spec:
         return False
 
-    ok, freshness, _detail = _check_backup_telemetry(telemetry_job)
-    if not ok or freshness is None:
+    ok, value, _detail = _check_backup_telemetry(telemetry_job, spec["expr"])
+    if not ok or value is None:
         return False
-    if freshness > BACKUP_FRESHNESS_FAULT_THRESHOLD_SECONDS:
+    if value > spec["threshold"]:
         return False
 
     return True

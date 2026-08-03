@@ -1,0 +1,75 @@
+WEBVTT
+
+NOTE
+Authored in-project for the Changeover demo rig. This is NOT a Blender-origin
+subtitle file and does not claim to be: the on-screen caption TEXT is authored
+test content written for this project. What IS real is the cue TIMING -- each
+cue start/end is placed on a real frame boundary of fixtures/source.mp4
+(29.97 fps / 30000:1001, 179.212s, 5371 frames), so a producer diffing cue
+timestamps against an advancing program clock is measuring a real quantity.
+
+The video is Tears of Steel (c) Blender Foundation, CC BY 3.0, used as the
+open-license program feed. The caption text below is ours.
+
+Cue cadence is deliberately ~2s with ~0.5s gaps so that a stalled cue producer
+is measurable against the program clock within a few seconds.
+
+00:00:02.002 --> 00:00:04.004
+<v Narrator>Program feed active. Accessibility layers nominal.
+
+00:00:04.505 --> 00:00:06.506
+<v Narrator>Caption layer reporting in sync with the program clock.
+
+00:00:07.007 --> 00:00:09.009
+<v Narrator>Sign language layer reporting frame delivery.
+
+00:00:09.510 --> 00:00:11.511
+<v Narrator>Audio description layer standing by.
+
+00:00:12.012 --> 00:00:14.014
+<v Narrator>All three layers holding steady.
+
+00:00:14.515 --> 00:00:16.516
+<v Narrator>Program clock advancing normally.
+
+00:00:17.017 --> 00:00:19.019
+<v Narrator>Caption cue cadence nominal.
+
+00:00:19.520 --> 00:00:21.521
+<v Narrator>No drift detected across monitored layers.
+
+00:00:22.022 --> 00:00:24.024
+<v Narrator>Encoder output stable.
+
+00:00:24.525 --> 00:00:26.526
+<v Narrator>Packager queue depth within limits.
+
+00:00:27.027 --> 00:00:29.029
+<v Narrator>Caption timing continues to track the program clock.
+
+00:00:29.530 --> 00:00:31.531
+<v Narrator>Layer health checks passing.
+
+00:00:32.032 --> 00:00:34.034
+<v Narrator>Monitoring window continuing.
+
+00:00:34.535 --> 00:00:36.536
+<v Narrator>All accessibility layers remain available.
+
+00:00:37.037 --> 00:00:39.039
+<v Narrator>Caption sync holding at baseline.
+
+00:00:39.540 --> 00:00:41.541
+<v Narrator>Program feed uninterrupted.
+
+00:00:42.042 --> 00:00:44.044
+<v Narrator>Cue delivery on schedule.
+
+00:00:44.545 --> 00:00:46.546
+<v Narrator>Downstream distribution nominal.
+
+00:00:47.047 --> 00:00:49.049
+<v Narrator>Accessibility telemetry reporting normally.
+
+00:00:49.550 --> 00:00:51.551
+<v Narrator>End of monitored caption window.

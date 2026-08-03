@@ -125,6 +125,45 @@ This starts Grafana, Prometheus, Pushgateway, and two Grafana MCP server contain
 - Local MCP server: http://localhost:8000/mcp
 - Cloud-pointed MCP server: http://localhost:8001/mcp
 
+## Ring 1 — captions happy path (one command)
+
+```bash
+./scripts/ring1_captions_demo.sh --approve
+```
+
+Brings the rig up, runs a real baseline and a real frozen-captions fault, measures the
+backup's own health, then runs the assembled agent: evidence gate → Grafana MCP
+investigation → diagnosis → backup verification → human-authorized failover → recorded
+swap in `logs/feed_state.json`.
+
+Without `--approve` the agent still investigates and recommends, but `failover_tool.py`
+refuses the switch — there is no path for the model to authorize itself.
+
+### The measured caption metric
+
+`caption_cue_sync_offset_seconds` is computed by
+[scripts/caption_cue_with_telemetry.py](scripts/caption_cue_with_telemetry.py) as:
+
+```
+offset = program_clock_now - media_timestamp_of_last_published_cue
+```
+
+A cue-publisher thread walks the real WebVTT sidecar
+(`fixtures/captions/tears_of_steel.en.vtt`) against a real program clock; an independent
+sampler thread polls the offset on its own interval. When the fault stops the publisher,
+`last_cue` freezes while the program clock keeps advancing, so the offset climbs for real.
+Nothing is injected — the climb is arithmetic on two clocks, one of which stopped.
+
+**This is a different physical quantity from `caption_sync_offset_seconds`**, which
+[scripts/transcode_with_telemetry.py](scripts/transcode_with_telemetry.py) computes as
+`|wall_elapsed - ffmpeg_video_PTS|` — an *encoder-drift* measurement that never touches a
+caption. The two metrics are deliberately kept separate and must not be conflated.
+
+**On the caption sidecar:** the cue *timing* is real and frame-aligned to the actual media,
+but the caption *text* is authored in-project for this demo. It is not a Blender-origin
+subtitle file and does not claim to be. The video is Tears of Steel (© Blender Foundation,
+CC BY 3.0).
+
 ## Run the real fault-injection pipelines
 
 Each of these drives a real process (ffmpeg, a real HTTP server) to produce genuine
